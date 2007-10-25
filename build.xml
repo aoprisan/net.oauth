@@ -12,6 +12,7 @@
   <property name="compile.debug"       value="true"/>
   <property name="compile.deprecation" value="false"/>
   <property name="compile.optimize"    value="true"/>
+  <property name="compile.verbose"     value="false"/>
 
   <path id="compile.classpath">
     <fileset dir="lib">
@@ -44,7 +45,8 @@
            destdir="${build.home}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           optimize="${compile.optimize}">
+           optimize="${compile.optimize}"
+           verbose="${compile.verbose}">
         <classpath refid="compile.classpath"/>
     </javac>
 
