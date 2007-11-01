@@ -41,13 +41,14 @@
           depends="prepare"
           description="Compile Java sources">
     <!-- Compile Java classes as necessary -->
-    <javac srcdir="${src.home}"
-           destdir="${build.home}"
+    <javac destdir="${build.home}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            optimize="${compile.optimize}"
            verbose="${compile.verbose}">
         <classpath refid="compile.classpath"/>
+        <src path="${src.home}"/>
+        <src path="${basedir}/test"/>
     </javac>
 
     <!-- Copy application resources -->
