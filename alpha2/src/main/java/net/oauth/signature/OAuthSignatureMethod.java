@@ -107,14 +107,12 @@ public abstract class OAuthSignatureMethod {
     }
 
     protected String getBaseString(OAuthMessage message) throws IOException {
-        return OAuth.percentEncode(message.httpMethod)
+        return OAuth.percentEncode(message.httpMethod.toUpperCase())
                 + '&'
                 + OAuth.percentEncode(message.URL)
                 + '&'
                 + OAuth.percentEncode(normalizeParameters(message
-                        .getParameters())) + '&'
-                + OAuth.percentEncode(getConsumerSecret()) + '&'
-                + OAuth.percentEncode(getTokenSecret());
+                        .getParameters()));
     }
 
     protected String normalizeParameters(
