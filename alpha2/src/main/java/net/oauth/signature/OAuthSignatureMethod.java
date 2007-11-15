@@ -32,181 +32,192 @@ import org.apache.commons.codec.binary.Base64;
 /** A pair of algorithms for computing and verifying an OAuth digital signature. */
 public abstract class OAuthSignatureMethod {
 
-    public static void sign(OAuthMessage message, OAuthConsumer consumer,
-	    String tokenSecret) throws Exception {
-	OAuthSignatureMethod signer = OAuthSignatureMethod.newMethod(message
-		.getParameter("oauth_signature_method"), consumer);
-	signer.setTokenSecret(tokenSecret);
-	signer.sign(message);
-    }
-
     public void sign(OAuthMessage message) throws Exception {
-	message.addParameter(new OAuth.Parameter("oauth_signature",
-		getSignature(message)));
+        message.addParameter(new OAuth.Parameter("oauth_signature",
+                getSignature(message)));
     }
 
-    public boolean verify(OAuthMessage message) throws Exception {
-	return verify(message.getSignature(), getBaseString(message));
+    /**
+     * @throws OAuthProblemException
+     *             the signature is invalid.
+     */
+    public void verify(OAuthMessage message) throws Exception {
+        message.requireParameters("oauth_signature");
+        String signature = message.getSignature();
+        String baseString = getBaseString(message);
+        if (!verify(signature, baseString)) {
+            OAuthProblemException problem = new OAuthProblemException(
+                    "signature_invalid");
+            problem.setParameter("oauth_signature", signature);
+            problem.setParameter("oauth_signature_base_string", baseString);
+            throw problem;
+        }
     }
 
-    String getSignature(OAuthMessage message) throws Exception {
-	return sign(getBaseString(message));
+    protected String getSignature(OAuthMessage message) throws Exception {
+        return sign(getBaseString(message));
     }
 
     protected void initialize(String name, OAuthConsumer consumer)
-	    throws Exception {
-	String secret = consumer.consumerSecret;
-	if (name.endsWith(_ACCESSOR)) {
-	    Object accessorSecret = consumer
-		    .getProperty(OAuthConsumer.ACCESSOR_SECRET);
-	    if (accessorSecret != null) {
-		secret = accessorSecret.toString();
-	    }
-	}
-	if (secret == null) {
-	    secret = "";
-	}
-	setConsumerSecret(secret);
+            throws Exception {
+        String secret = consumer.consumerSecret;
+        if (name.endsWith(_ACCESSOR)) {
+            Object accessorSecret = consumer
+                    .getProperty(OAuthConsumer.ACCESSOR_SECRET);
+            if (accessorSecret != null) {
+                secret = accessorSecret.toString();
+            }
+        }
+        if (secret == null) {
+            secret = "";
+        }
+        setConsumerSecret(secret);
     }
 
     /** Compute the signature for the given base string. */
     protected abstract String sign(String baseString) throws Exception;
 
     /**
-         * Decide whether a signature is correct.
-         * 
-         * @return true if and only if the signature matches the base string.
-         */
+     * Decide whether a signature is correct.
+     * 
+     * @returns true only if the signature is correct.
+     */
     protected abstract boolean verify(String signature, String baseString)
-	    throws Exception;
+            throws Exception;
 
     private String consumerSecret;
 
     private String tokenSecret;
 
     public String getConsumerSecret() {
-	return consumerSecret;
+        return consumerSecret;
     }
 
     public void setConsumerSecret(String consumerSecret) {
-	this.consumerSecret = consumerSecret;
+        this.consumerSecret = consumerSecret;
     }
 
     public String getTokenSecret() {
-	return tokenSecret;
+        return tokenSecret;
     }
 
     public void setTokenSecret(String tokenSecret) {
-	this.tokenSecret = tokenSecret;
+        this.tokenSecret = tokenSecret;
     }
 
     public String getBaseString(OAuthMessage message) throws IOException {
-	return OAuth.percentEncode(message.httpMethod) //
-		+ '&'
-		+ OAuth.percentEncode(message.URL) //
-		+ '&'
-		+ OAuth.percentEncode(normalizeParameters(message
-			.getParameters())) //
-		+ '&' + OAuth.percentEncode(getConsumerSecret()) //
-		+ '&' + OAuth.percentEncode(getTokenSecret());
+        return OAuth.percentEncode(message.httpMethod)
+                + '&'
+                + OAuth.percentEncode(message.URL)
+                + '&'
+                + OAuth.percentEncode(normalizeParameters(message
+                        .getParameters())) + '&'
+                + OAuth.percentEncode(getConsumerSecret()) + '&'
+                + OAuth.percentEncode(getTokenSecret());
     }
 
     public String normalizeParameters(Collection<? extends Map.Entry> parameters)
-	    throws IOException {
-	if (parameters == null) {
-	    return "";
-	}
-	List<ComparableParameter> p = new ArrayList<ComparableParameter>(
-		parameters.size());
-	for (Map.Entry parameter : parameters) {
-	    if (!"oauth_signature".equals(parameter.getKey())) {
-		p.add(new ComparableParameter(parameter));
-	    }
-	}
-	Collections.sort(p);
-	return OAuth.formEncode(getParameters(p));
+            throws IOException {
+        if (parameters == null) {
+            return "";
+        }
+        List<ComparableParameter> p = new ArrayList<ComparableParameter>(
+                parameters.size());
+        for (Map.Entry parameter : parameters) {
+            if (!"oauth_signature".equals(parameter.getKey())) {
+                p.add(new ComparableParameter(parameter));
+            }
+        }
+        Collections.sort(p);
+        return OAuth.formEncode(getParameters(p));
     }
 
     public static byte[] decodeBase64(String s) {
-	return BASE64.decode(s.getBytes());
+        return BASE64.decode(s.getBytes());
     }
 
     public static String base64Encode(byte[] b) {
-	return new String(BASE64.encode(b));
+        return new String(BASE64.encode(b));
     }
 
     private static final Base64 BASE64 = new Base64();
 
     /** The factory for signature methods. */
     public static OAuthSignatureMethod newMethod(String name,
-	    OAuthConsumer consumer) throws Exception {
-	Class methodClass = NAME_TO_CLASS.get(name);
-	if (methodClass == null) {
-	    throw new OAuthProblemException("signature_method_rejected");
-	    // TODO: report oauth_acceptable_signature_methods
-	}
-	OAuthSignatureMethod method = (OAuthSignatureMethod) methodClass
-		.newInstance();
-	method.initialize(name, consumer);
-	return method;
+            OAuthConsumer consumer) throws Exception {
+        Class methodClass = NAME_TO_CLASS.get(name);
+        if (methodClass == null) {
+            OAuthProblemException problem = new OAuthProblemException(
+                    "signature_method_rejected");
+            String acceptable = OAuth.percentEncode(NAME_TO_CLASS.keySet());
+            if (acceptable.length() > 0) {
+                problem.setParameter("oauth_acceptable_signature_methods",
+                        acceptable.toString());
+            }
+            throw problem;
+        }
+        OAuthSignatureMethod method = (OAuthSignatureMethod) methodClass
+                .newInstance();
+        method.initialize(name, consumer);
+        return method;
     }
 
     /**
-         * Subsequently, newMethod(name) will attempt to instantiate the given
-         * class (with no constructor parameters).
-         */
+     * Subsequently, newMethod(name) will attempt to instantiate the given class
+     * (with no constructor parameters).
+     */
     public static void registerMethodClass(String name, Class clazz) {
-	NAME_TO_CLASS.put(name, clazz);
+        NAME_TO_CLASS.put(name, clazz);
     }
 
     public static final String _ACCESSOR = "-Accessor";
 
     private static final Map<String, Class> NAME_TO_CLASS = new ConcurrentHashMap<String, Class>();
     static {
-	registerMethodClass("HMAC-SHA1", HMAC_SHA1.class);
-	registerMethodClass("PLAINTEXT", PLAINTEXT.class);
-	registerMethodClass("HMAC-SHA1" + _ACCESSOR, HMAC_SHA1.class);
-	registerMethodClass("PLAINTEXT" + _ACCESSOR, PLAINTEXT.class);
+        registerMethodClass("HMAC-SHA1", HMAC_SHA1.class);
+        registerMethodClass("PLAINTEXT", PLAINTEXT.class);
+        registerMethodClass("HMAC-SHA1" + _ACCESSOR, HMAC_SHA1.class);
+        registerMethodClass("PLAINTEXT" + _ACCESSOR, PLAINTEXT.class);
     }
 
     private static List<Map.Entry> getParameters(
-	    Collection<ComparableParameter> parameters) {
-	if (parameters == null) {
-	    return null;
-	}
-	List<Map.Entry> list = new ArrayList<Map.Entry>(parameters.size());
-	for (ComparableParameter parameter : parameters) {
-	    list.add(parameter.value);
-	}
-	return list;
+            Collection<ComparableParameter> parameters) {
+        if (parameters == null) {
+            return null;
+        }
+        List<Map.Entry> list = new ArrayList<Map.Entry>(parameters.size());
+        for (ComparableParameter parameter : parameters) {
+            list.add(parameter.value);
+        }
+        return list;
     }
 
     private static class ComparableParameter implements
-	    Comparable<ComparableParameter> {
+            Comparable<ComparableParameter> {
 
-	ComparableParameter(Map.Entry value) {
-	    this.value = value;
-	    String n = toString(value.getKey());
-	    String v = toString(value.getValue());
-	    this.key = OAuth.percentEncode(n) + ' ' + OAuth.percentEncode(v);
-	}
+        ComparableParameter(Map.Entry value) {
+            this.value = value;
+            String n = toString(value.getKey());
+            String v = toString(value.getValue());
+            this.key = OAuth.percentEncode(n) + ' ' + OAuth.percentEncode(v);
+        }
 
-	final Map.Entry value;
+        final Map.Entry value;
 
-	private final String key;
+        private final String key;
 
-	private static final String toString(Object from) {
-	    return (from == null) ? null : from.toString();
-	}
+        private static final String toString(Object from) {
+            return (from == null) ? null : from.toString();
+        }
 
-	public int compareTo(ComparableParameter that) {
-	    return this.key.compareTo(that.key);
-	}
+        public int compareTo(ComparableParameter that) {
+            return this.key.compareTo(that.key);
+        }
 
-	@Override
-	public String toString() {
-	    return key;
-	}
+        @Override
+        public String toString() {
+            return key;
+        }
 
     }
 

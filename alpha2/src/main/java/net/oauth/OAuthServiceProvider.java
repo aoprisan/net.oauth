@@ -25,10 +25,10 @@ public class OAuthServiceProvider {
     public final String accessTokenURL;
 
     public OAuthServiceProvider(String requestTokenURL,
-	    String userAuthorizationURL, String accessTokenURL) {
-	this.requestTokenURL = requestTokenURL;
-	this.userAuthorizationURL = userAuthorizationURL;
-	this.accessTokenURL = accessTokenURL;
+            String userAuthorizationURL, String accessTokenURL) {
+        this.requestTokenURL = requestTokenURL;
+        this.userAuthorizationURL = userAuthorizationURL;
+        this.accessTokenURL = accessTokenURL;
     }
 
 }

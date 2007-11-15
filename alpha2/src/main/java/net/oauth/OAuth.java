@@ -36,158 +36,169 @@ public class OAuth {
     public static final String FORM_ENCODED = "application/x-www-form-urlencoded";
 
     public static boolean isFormEncoded(String contentType) {
-	if (contentType == null) {
-	    return false;
-	}
-	int semi = contentType.indexOf(";");
-	if (semi >= 0) {
-	    contentType = contentType.substring(0, semi);
-	}
-	return FORM_ENCODED.equalsIgnoreCase(contentType.trim());
+        if (contentType == null) {
+            return false;
+        }
+        int semi = contentType.indexOf(";");
+        if (semi >= 0) {
+            contentType = contentType.substring(0, semi);
+        }
+        return FORM_ENCODED.equalsIgnoreCase(contentType.trim());
     }
 
     public static String formEncode(Iterable<? extends Map.Entry> parameters)
-	    throws IOException {
-	ByteArrayOutputStream b = new ByteArrayOutputStream();
-	formEncode(parameters, b);
-	return new String(b.toByteArray());
+            throws IOException {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        formEncode(parameters, b);
+        return new String(b.toByteArray());
     }
 
     public static void formEncode(Iterable<? extends Map.Entry> parameters,
-	    OutputStream into) throws IOException {
-	if (parameters != null) {
-	    boolean first = true;
-	    for (Map.Entry parameter : parameters) {
-		if (first) {
-		    first = false;
-		} else {
-		    into.write('&');
-		}
-		into.write(percentEncode(toString(parameter.getKey()))
-			.getBytes());
-		into.write('=');
-		into.write(percentEncode(toString(parameter.getValue()))
-			.getBytes());
-	    }
-	}
+            OutputStream into) throws IOException {
+        if (parameters != null) {
+            boolean first = true;
+            for (Map.Entry parameter : parameters) {
+                if (first) {
+                    first = false;
+                } else {
+                    into.write('&');
+                }
+                into.write(percentEncode(toString(parameter.getKey()))
+                        .getBytes());
+                into.write('=');
+                into.write(percentEncode(toString(parameter.getValue()))
+                        .getBytes());
+            }
+        }
     }
 
     public static List<Parameter> decodeForm(String form) {
-	List<Parameter> list = new ArrayList<Parameter>();
-	if (form != null) {
-	    for (String nvp : form.split("\\&")) {
-		int equals = nvp.indexOf('=');
-		String name;
-		String value;
-		if (equals < 0) {
-		    name = decodePercent(nvp);
-		    value = null;
-		} else {
-		    name = decodePercent(nvp.substring(0, equals));
-		    value = decodePercent(nvp.substring(equals + 1));
-		}
-		list.add(new Parameter(name, value));
-	    }
-	}
-	return list;
+        List<Parameter> list = new ArrayList<Parameter>();
+        if (form != null) {
+            for (String nvp : form.split("\\&")) {
+                int equals = nvp.indexOf('=');
+                String name;
+                String value;
+                if (equals < 0) {
+                    name = decodePercent(nvp);
+                    value = null;
+                } else {
+                    name = decodePercent(nvp.substring(0, equals));
+                    value = decodePercent(nvp.substring(equals + 1));
+                }
+                list.add(new Parameter(name, value));
+            }
+        }
+        return list;
+    }
+
+    public static String percentEncode(Iterable values) {
+        StringBuilder p = new StringBuilder();
+        for (Object v : values) {
+            if (p.length() > 0) {
+                p.append("&");
+            }
+            p.append(OAuth.percentEncode(toString(v)));
+        }
+        return p.toString();
     }
 
     public static String percentEncode(String s) {
-	if (s == null) {
-	    return "";
-	}
-	try {
-	    return URLEncoder.encode(s, ENCODING)
-		    // OAuth encodes some characters differently:
-		    .replace("+", "%20").replace("*", "%2A")
-		    .replace("%7E", "~");
-	    // This could be done faster with more hand-crafted code.
-	} catch (UnsupportedEncodingException wow) {
-	    throw new RuntimeException(wow.getMessage(), wow);
-	}
+        if (s == null) {
+            return "";
+        }
+        try {
+            return URLEncoder.encode(s, ENCODING)
+                    // OAuth encodes some characters differently:
+                    .replace("+", "%20").replace("*", "%2A")
+                    .replace("%7E", "~");
+            // This could be done faster with more hand-crafted code.
+        } catch (UnsupportedEncodingException wow) {
+            throw new RuntimeException(wow.getMessage(), wow);
+        }
     }
 
     public static String decodePercent(String s) {
-	try {
-	    return URLDecoder.decode(s, ENCODING);
-	    // This implements http://oauth.pbwiki.com/FlexibleDecoding
-	} catch (java.io.UnsupportedEncodingException wow) {
-	    throw new RuntimeException(wow.getMessage(), wow);
-	}
+        try {
+            return URLDecoder.decode(s, ENCODING);
+            // This implements http://oauth.pbwiki.com/FlexibleDecoding
+        } catch (java.io.UnsupportedEncodingException wow) {
+            throw new RuntimeException(wow.getMessage(), wow);
+        }
     }
 
     /**
-         * Construct a Map containing the a copy of the given parameters. If
-         * several parameters have the same name, the Map will contain the first
-         * value, only.
-         */
+     * Construct a Map containing the a copy of the given parameters. If several
+     * parameters have the same name, the Map will contain the first value,
+     * only.
+     */
     public static Map<String, String> newMap(Iterable<? extends Map.Entry> from) {
-	Map<String, String> map = new HashMap<String, String>();
-	if (from != null) {
-	    for (Map.Entry f : from) {
-		String key = toString(f.getKey());
-		if (!map.containsKey(key)) {
-		    map.put(key, toString(f.getValue()));
-		}
-	    }
-	}
-	return map;
+        Map<String, String> map = new HashMap<String, String>();
+        if (from != null) {
+            for (Map.Entry f : from) {
+                String key = toString(f.getKey());
+                if (!map.containsKey(key)) {
+                    map.put(key, toString(f.getValue()));
+                }
+            }
+        }
+        return map;
     }
 
     /** Construct a list of Parameters from name, value, name, value... */
     public static List<Parameter> newList(String... parameters) {
-	List<Parameter> list = new ArrayList<Parameter>(parameters.length / 2);
-	for (int p = 0; p + 1 < parameters.length; p += 2) {
-	    list.add(new Parameter(parameters[p], parameters[p + 1]));
-	}
-	return list;
+        List<Parameter> list = new ArrayList<Parameter>(parameters.length / 2);
+        for (int p = 0; p + 1 < parameters.length; p += 2) {
+            list.add(new Parameter(parameters[p], parameters[p + 1]));
+        }
+        return list;
     }
 
     public static class Parameter implements Map.Entry<String, String> {
 
-	public Parameter(String key, String value) {
-	    this.key = key;
-	    this.value = value;
-	}
+        public Parameter(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
 
-	private final String key;
+        private final String key;
 
-	private String value;
+        private String value;
 
-	public String getKey() {
-	    return key;
-	}
+        public String getKey() {
+            return key;
+        }
 
-	public String getValue() {
-	    return value;
-	}
+        public String getValue() {
+            return value;
+        }
 
-	public String setValue(String value) {
-	    try {
-		return this.value;
-	    } finally {
-		this.value = value;
-	    }
-	}
+        public String setValue(String value) {
+            try {
+                return this.value;
+            } finally {
+                this.value = value;
+            }
+        }
 
-	@Override
-	public String toString() {
-	    return percentEncode(getKey()) + '=' + percentEncode(getValue());
-	}
+        @Override
+        public String toString() {
+            return percentEncode(getKey()) + '=' + percentEncode(getValue());
+        }
     }
 
     private static final String toString(Object from) {
-	return (from == null) ? null : from.toString();
+        return (from == null) ? null : from.toString();
     }
 
     public static String addParameters(String url, String... parameters)
-	    throws IOException {
-	String form = formEncode(newList(parameters));
-	if (form.length() <= 0) {
-	    return url;
-	} else {
-	    return url + ((url.indexOf("?") < 0) ? '?' : '&') + form;
-	}
+            throws IOException {
+        String form = formEncode(newList(parameters));
+        if (form.length() <= 0) {
+            return url;
+        } else {
+            return url + ((url.indexOf("?") < 0) ? '?' : '&') + form;
+        }
     }
 
 }

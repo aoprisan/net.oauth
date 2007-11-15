@@ -23,65 +23,65 @@ public class OAuthTest extends TestCase {
     private static final String[] STANDARD =
     // label, input, expected result
     { "ALPHA", "abcABC", "abcABC" //
-	    , "DIGIT", "123", "123" //
-	    , "unreserved", "-._~", "-._~" //
-	    , "percent", "%", "%25" //
-	    , "not unreserved", "&=*", "%26%3D%2A" //
-	    , "LF", "\n", "%0A" //
-	    , "SP", " ", "%20" //
-	    , "DEL", "\u007F", "%7F" //
-	    , "Latin", "\u0080", "%C2%80" //
-	    , "CJK", "\u3001", "%E3%80%81" //
+            , "DIGIT", "123", "123" //
+            , "unreserved", "-._~", "-._~" //
+            , "percent", "%", "%25" //
+            , "not unreserved", "&=*", "%26%3D%2A" //
+            , "LF", "\n", "%0A" //
+            , "SP", " ", "%20" //
+            , "DEL", "\u007F", "%7F" //
+            , "Latin", "\u0080", "%C2%80" //
+            , "CJK", "\u3001", "%E3%80%81" //
     };
 
     private static final String[] FLEXIBLE =
     // label, input, expected result
     { "SP", " ", "+" //
-	    , "slash", "/", "%2F" //
-	    , "not unreserved", "&=*", "%26%3D%2A" //
-	    , "lower case hex", "/=*\u3001", "%2f%3d%2a%e3%80%81" //
+            , "slash", "/", "%2F" //
+            , "not unreserved", "&=*", "%26%3D%2A" //
+            , "lower case hex", "/=*\u3001", "%2f%3d%2a%e3%80%81" //
     };
 
     public void testEncode() {
-	StringBuffer errors = new StringBuffer();
-	for (int c = 0; c < STANDARD.length; c += 3) {
-	    String label = STANDARD[c];
-	    String input = STANDARD[c + 1];
-	    String expected = STANDARD[c + 2];
-	    String actual = OAuth.percentEncode(input);
-	    if (!expected.equals(actual)) {
-		if (errors.length() > 0)
-		    errors.append(", ");
-		errors.append(label).append(" ").append(actual);
-	    }
-	}
-	if (errors.length() > 0)
-	    fail(errors.toString());
+        StringBuffer errors = new StringBuffer();
+        for (int c = 0; c < STANDARD.length; c += 3) {
+            String label = STANDARD[c];
+            String input = STANDARD[c + 1];
+            String expected = STANDARD[c + 2];
+            String actual = OAuth.percentEncode(input);
+            if (!expected.equals(actual)) {
+                if (errors.length() > 0)
+                    errors.append(", ");
+                errors.append(label).append(" ").append(actual);
+            }
+        }
+        if (errors.length() > 0)
+            fail(errors.toString());
     }
 
     public void testDecodeStandard() {
-	testDecode(STANDARD);
+        testDecode(STANDARD);
     }
 
     public void testDecodeFlexible() {
-	testDecode(FLEXIBLE);
+        testDecode(FLEXIBLE);
     }
 
     private static void testDecode(String[] cases) {
-	StringBuffer errors = new StringBuffer();
-	for (int c = 0; c < cases.length; c += 3) {
-	    String label = cases[c];
-	    String input = cases[c + 2];
-	    String expected = cases[c + 1];
-	    String actual = OAuth.decodePercent(input);
-	    if (!expected.equals(actual)) {
-		if (errors.length() > 0)
-		    errors.append(", ");
-		errors.append(label).append(" ").append(actual);
-	    }
-	}
-	if (errors.length() > 0)
-	    fail(errors.toString());
+        StringBuffer errors = new StringBuffer();
+        for (int c = 0; c < cases.length; c += 3) {
+            String label = cases[c];
+            String input = cases[c + 2];
+            String expected = cases[c + 1];
+            String actual = OAuth.decodePercent(input);
+            if (!expected.equals(actual)) {
+                if (errors.length() > 0)
+                    errors.append(", ");
+                errors.append(label).append(" ").append(actual);
+            }
+        }
+        if (errors.length() > 0)
+            fail(errors.toString());
     }
 
 }

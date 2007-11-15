@@ -31,70 +31,68 @@ import org.apache.commons.httpclient.HttpStatus;
 public class OAuthHttpClient {
 
     /**
-         * Check whether a response indicates an problem. If so, throw an
-         * OAuthProblemException.
-         */
+     * Check whether a response indicates an problem. If so, throw an
+     * OAuthProblemException.
+     */
     public static void checkResponse(HttpMethod method) throws IOException,
-	    OAuthProblemException {
-	int statusCode = method.getStatusCode();
-	if (statusCode != HttpStatus.SC_OK) {
-	    String statusText = method.getStatusText();
-	    Map<String, String> parameters = OAuth
-		    .newMap(getResponseParameters(method));
-	    String message = parameters
-		    .get(OAuthProblemException.OAUTH_PROBLEM);
-	    if (message == null) {
-		message = "HTTP status " + statusCode + " " + statusText;
-	    }
-	    OAuthProblemException problem = new OAuthProblemException(message);
-	    Map<String, Object> problemParameters = problem.getParameters();
-	    problemParameters.putAll(parameters);
-	    problemParameters.put("URL", method.getURI().toString());
-	    problemParameters.put(OAuthProblemException.HTTP_STATUS_CODE,
-		    new Integer(statusCode));
-	    problemParameters.put(OAuthProblemException.HTTP_STATUS_TEXT,
-		    statusText);
-	    if (statusCode == HttpStatus.SC_MOVED_TEMPORARILY
-		    || statusCode == HttpStatus.SC_MOVED_PERMANENTLY) {
-		Header location = method.getResponseHeader("Location");
-		if (location != null) {
-		    problemParameters.put("Location", location.getValue());
-		}
-	    }
-	    throw problem;
-	}
+            OAuthProblemException {
+        int statusCode = method.getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            String statusText = method.getStatusText();
+            Map<String, String> parameters = OAuth
+                    .newMap(getResponseParameters(method));
+            String message = parameters
+                    .get(OAuthProblemException.OAUTH_PROBLEM);
+            if (message == null) {
+                message = "HTTP status " + statusCode + " " + statusText;
+            }
+            OAuthProblemException problem = new OAuthProblemException(message);
+            problem.getParameters().putAll(parameters);
+            problem.setParameter("URL", method.getURI().toString());
+            problem.setParameter(OAuthProblemException.HTTP_STATUS_CODE,
+                    new Integer(statusCode));
+            problem.setParameter(OAuthProblemException.HTTP_STATUS_TEXT,
+                    statusText);
+            if (statusCode == HttpStatus.SC_MOVED_TEMPORARILY
+                    || statusCode == HttpStatus.SC_MOVED_PERMANENTLY) {
+                Header location = method.getResponseHeader("Location");
+                if (location != null) {
+                    problem.setParameter("Location", location.getValue());
+                }
+            }
+            throw problem;
+        }
     }
 
     /**
-         * Construct an OAuthMessage from the HTTP response, including
-         * parameters from OAuth WWW-Authenticate headers and the body. The
-         * header parameters come first, followed by the ones from the response
-         * body.
-         */
+     * Construct an OAuthMessage from the HTTP response, including parameters
+     * from OAuth WWW-Authenticate headers and the body. The header parameters
+     * come first, followed by the ones from the response body.
+     */
     public static OAuthMessage getResponseMessage(HttpMethod method)
-	    throws IOException {
-	return new OAuthMessage(method.getName(), method.getURI().toString(),
-		getResponseParameters(method));
+            throws IOException {
+        return new OAuthMessage(method.getName(), method.getURI().toString(),
+                getResponseParameters(method));
     }
 
     /**
-         * Gather all the response parameters, including OAuth WWW-Authenticate
-         * headers and parameters from the body. The header parameters come
-         * first, followed by the ones from the body.
-         */
+     * Gather all the response parameters, including OAuth WWW-Authenticate
+     * headers and parameters from the body. The header parameters come first,
+     * followed by the ones from the body.
+     */
     private static List<OAuth.Parameter> getResponseParameters(HttpMethod method)
-	    throws IOException {
-	List<OAuth.Parameter> list = new ArrayList<OAuth.Parameter>();
-	for (Header header : method.getResponseHeaders("WWW-Authenticate")) {
-	    for (OAuth.Parameter parameter : OAuthMessage
-		    .decodeAuthorization(header.getValue())) {
-		if (!"realm".equalsIgnoreCase(parameter.getKey())) {
-		    list.add(parameter);
-		}
-	    }
-	}
-	list.addAll(OAuth.decodeForm(method.getResponseBodyAsString()));
-	return list;
+            throws IOException {
+        List<OAuth.Parameter> list = new ArrayList<OAuth.Parameter>();
+        for (Header header : method.getResponseHeaders("WWW-Authenticate")) {
+            for (OAuth.Parameter parameter : OAuthMessage
+                    .decodeAuthorization(header.getValue())) {
+                if (!"realm".equalsIgnoreCase(parameter.getKey())) {
+                    list.add(parameter);
+                }
+            }
+        }
+        list.addAll(OAuth.decodeForm(method.getResponseBodyAsString()));
+        return list;
     }
 
 }

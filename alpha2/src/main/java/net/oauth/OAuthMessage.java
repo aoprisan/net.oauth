@@ -24,19 +24,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.oauth.signature.OAuthSignatureMethod;
 
 public class OAuthMessage {
 
     public OAuthMessage(String httpMethod, String URL,
-	    Collection<? extends Map.Entry> parameters) {
-	this.httpMethod = httpMethod;
-	this.URL = URL;
-	this.parameters = new ArrayList<Map.Entry<String, String>>(parameters
-		.size());
-	for (Map.Entry entry : parameters) {
-	    this.parameters.add(new OAuth.Parameter(toString(entry.getKey()),
-		    toString(entry.getValue())));
-	}
+            Collection<? extends Map.Entry> parameters) {
+        this.httpMethod = httpMethod;
+        this.URL = URL;
+        this.parameters = new ArrayList<Map.Entry<String, String>>(parameters
+                .size());
+        for (Map.Entry entry : parameters) {
+            this.parameters.add(new OAuth.Parameter(toString(entry.getKey()),
+                    toString(entry.getValue())));
+        }
     }
 
     public final String httpMethod;
@@ -48,120 +49,138 @@ public class OAuthMessage {
     private Map<String, String> parameterMap;
 
     public String toString() {
-	return "OAuthMessage(" + httpMethod + ", " + URL + ", " + parameters
-		+ ")";
+        return "OAuthMessage(" + httpMethod + ", " + URL + ", " + parameters
+                + ")";
     }
 
     public List<Map.Entry<String, String>> getParameters() {
-	return Collections.unmodifiableList(parameters);
+        return Collections.unmodifiableList(parameters);
     }
 
     public void addParameter(Map.Entry<String, String> parameter) {
-	parameters.add(parameter);
-	parameterMap = null;
+        parameters.add(parameter);
+        parameterMap = null;
     }
 
     public void addParameters(
-	    Collection<? extends Map.Entry<String, String>> parameters) {
-	this.parameters.addAll(parameters);
-	parameterMap = null;
+            Collection<? extends Map.Entry<String, String>> parameters) {
+        this.parameters.addAll(parameters);
+        parameterMap = null;
     }
 
     public String getParameter(String name) {
-	return getParameterMap().get(name);
+        return getParameterMap().get(name);
     }
 
     public String getConsumerKey() {
-	return getParameter("oauth_consumer_key");
+        return getParameter("oauth_consumer_key");
     }
 
     public String getToken() {
-	return getParameter("oauth_token");
+        return getParameter("oauth_token");
     }
 
     public String getSignatureMethod() {
-	return getParameter("oauth_signature_method");
+        return getParameter("oauth_signature_method");
     }
 
     public String getSignature() {
-	return getParameter("oauth_signature");
+        return getParameter("oauth_signature");
     }
 
     private Map<String, String> getParameterMap() {
-	if (parameterMap == null) {
-	    parameterMap = OAuth.newMap(parameters);
-	}
-	return parameterMap;
+        if (parameterMap == null) {
+            parameterMap = OAuth.newMap(parameters);
+        }
+        return parameterMap;
     }
 
     /**
-         * Verify that the required parameter names are contained in the actual
-         * collection.
-         * 
-         * @throws OAuthProblemException
-         *                 one or more parameters are absent.
-         */
+     * Verify that the required parameter names are contained in the actual
+     * collection.
+     * 
+     * @throws OAuthProblemException
+     *             one or more parameters are absent.
+     */
     public void requireParameters(String... names) throws OAuthProblemException {
-	Set<String> present = getParameterMap().keySet();
-	StringBuilder absent = new StringBuilder();
-	for (String required : names) {
-	    if (!present.contains(required)) {
-		if (absent.length() > 0)
-		    absent.append('&');
-		absent.append(OAuth.percentEncode(required));
-	    }
-	}
-	if (absent.length() > 0) {
-	    OAuthProblemException problem = new OAuthProblemException(
-		    "parameter_absent");
-	    problem.getParameters().put("oauth_parameters_absent",
-		    absent.toString());
-	    throw problem;
-	}
+        Set<String> present = getParameterMap().keySet();
+        StringBuilder absent = new StringBuilder();
+        for (String required : names) {
+            if (!present.contains(required)) {
+                if (absent.length() > 0)
+                    absent.append('&');
+                absent.append(OAuth.percentEncode(required));
+            }
+        }
+        if (absent.length() > 0) {
+            OAuthProblemException problem = new OAuthProblemException(
+                    "parameter_absent");
+            problem.setParameter("oauth_parameters_absent", absent.toString());
+            throw problem;
+        }
     }
 
     /** Construct a WWW-Authenticate or Authentication header value. */
     public String getAuthorizationHeader(String realm) {
-	StringBuilder into = new StringBuilder(AUTH_SCHEME);
-	into.append(" realm=\"").append(OAuth.percentEncode(realm)).append('"');
-	if (parameters != null) {
-	    for (Map.Entry parameter : parameters) {
-		String name = toString(parameter.getKey());
-		if (name.startsWith("oauth_")) {
-		    into.append(", ");
-		    into.append(OAuth.percentEncode(name)).append("=\"")
-			    .append(
-				    OAuth.percentEncode(toString(parameter
-					    .getValue()))).append('"');
-		}
-	    }
-	}
-	return into.toString();
+        StringBuilder into = new StringBuilder(AUTH_SCHEME);
+        into.append(" realm=\"").append(OAuth.percentEncode(realm)).append('"');
+        if (parameters != null) {
+            for (Map.Entry parameter : parameters) {
+                String name = toString(parameter.getKey());
+                if (name.startsWith("oauth_")) {
+                    into.append(", ");
+                    into.append(OAuth.percentEncode(name)).append("=\"")
+                            .append(
+                                    OAuth.percentEncode(toString(parameter
+                                            .getValue()))).append('"');
+                }
+            }
+        }
+        return into.toString();
+    }
+
+    public void sign(OAuthConsumer consumer, String tokenSecret)
+            throws Exception {
+        getSigner(consumer, tokenSecret).sign(this);
+    }
+
+    public void verifySignature(OAuthConsumer consumer, String tokenSecret)
+            throws Exception {
+        getSigner(consumer, tokenSecret).verify(this);
+    }
+
+    private OAuthSignatureMethod getSigner(OAuthConsumer consumer,
+            String tokenSecret) throws Exception {
+        requireParameters("oauth_signature_method");
+        OAuthSignatureMethod signer = OAuthSignatureMethod.newMethod(
+                getSignatureMethod(), consumer);
+        signer.setTokenSecret(tokenSecret);
+        return signer;
     }
 
     /**
-         * Parse the parameters from an OAuth Authorization or WWW-Authenticate
-         * header. The realm is included as a parameter. If the given header
-         * doesn't start with "OAuth ", return an empty list.
-         */
+     * Parse the parameters from an OAuth Authorization or WWW-Authenticate
+     * header. The realm is included as a parameter. If the given header doesn't
+     * start with "OAuth ", return an empty list.
+     */
     public static List<OAuth.Parameter> decodeAuthorization(String authorization) {
-	List<OAuth.Parameter> into = new ArrayList<OAuth.Parameter>();
-	if (authorization != null) {
-	    Matcher m = AUTHORIZATION.matcher(authorization);
-	    if (m.matches()) {
-		if (AUTH_SCHEME.equalsIgnoreCase(m.group(1))) {
-		    for (String nvp : m.group(2).split("\\s*,\\s*")) {
-			m = NVP.matcher(nvp);
-			if (m.matches()) {
-			    String name = OAuth.decodePercent(m.group(1));
-			    String value = OAuth.decodePercent(m.group(2));
-			    into.add(new OAuth.Parameter(name, value));
-			}
-		    }
-		}
-	    }
-	}
-	return into;
+        List<OAuth.Parameter> into = new ArrayList<OAuth.Parameter>();
+        if (authorization != null) {
+            Matcher m = AUTHORIZATION.matcher(authorization);
+            if (m.matches()) {
+                if (AUTH_SCHEME.equalsIgnoreCase(m.group(1))) {
+                    for (String nvp : m.group(2).split("\\s*,\\s*")) {
+                        m = NVP.matcher(nvp);
+                        if (m.matches()) {
+                            String name = OAuth.decodePercent(m.group(1));
+                            String value = OAuth.decodePercent(m.group(2));
+                            into.add(new OAuth.Parameter(name, value));
+                        }
+                    }
+                }
+            }
+        }
+        return into;
     }
 
     public static final String AUTH_SCHEME = "OAuth";
@@ -171,7 +190,7 @@ public class OAuthMessage {
     static final Pattern NVP = Pattern.compile("(\\S*)\\s*\\=\\s*\"([^\"]*)\"");
 
     private static final String toString(Object from) {
-	return (from == null) ? null : from.toString();
+        return (from == null) ? null : from.toString();
     }
 
 }

@@ -18,7 +18,6 @@ package net.oauth;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.oauth.signature.OAuthSignatureMethod;
 
 public class OAuthConsumer {
 
@@ -31,36 +30,24 @@ public class OAuthConsumer {
     public final OAuthServiceProvider serviceProvider;
 
     public OAuthConsumer(String callbackURL, String consumerKey,
-	    String consumerSecret, OAuthServiceProvider serviceProvider) {
-	this.callbackURL = callbackURL;
-	this.consumerKey = consumerKey;
-	this.consumerSecret = consumerSecret;
-	this.serviceProvider = serviceProvider;
+            String consumerSecret, OAuthServiceProvider serviceProvider) {
+        this.callbackURL = callbackURL;
+        this.consumerKey = consumerKey;
+        this.consumerSecret = consumerSecret;
+        this.serviceProvider = serviceProvider;
     }
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
     public Object getProperty(String name) {
-	return properties.get(name);
+        return properties.get(name);
     }
 
     public void setProperty(String name, Object value) {
-	properties.put(name, value);
+        properties.put(name, value);
     }
 
     /** The name of the property whose value is the accessor secret. */
     public static final String ACCESSOR_SECRET = "accessorSecret";
-
-    public void checkSignature(OAuthMessage message, String tokenSecret)
-	    throws Exception {
-	message.requireParameters("oauth_signature_method", "oauth_signature");
-	String signatureMethod = message.getSignatureMethod();
-	OAuthSignatureMethod method = OAuthSignatureMethod.newMethod(
-		signatureMethod, this);
-	method.setTokenSecret(tokenSecret);
-	if (!method.verify(message)) {
-	    throw new OAuthProblemException("signature_invalid");
-	}
-    }
 
 }

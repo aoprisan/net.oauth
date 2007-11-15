@@ -32,111 +32,111 @@ import net.oauth.OAuthProblemException;
 public class OAuthServlet {
 
     /**
-         * Extract the parts of the given request that are relevant to OAuth.
-         * 
-         * @param URL
-         *                the official URL of this service; that is the URL a
-         *                legitimate client would have used to compute the
-         *                digital signature. If this parameter is null, this
-         *                method will try to reconstruct the URL from the HTTP
-         *                request; which may be wrong in some cases.
-         */
+     * Extract the parts of the given request that are relevant to OAuth.
+     * 
+     * @param URL
+     *            the official URL of this service; that is the URL a legitimate
+     *            client would have used to compute the digital signature. If
+     *            this parameter is null, this method will try to reconstruct
+     *            the URL from the HTTP request; which may be wrong in some
+     *            cases.
+     */
     public static OAuthMessage getMessage(HttpServletRequest request, String URL) {
-	if (URL == null) {
-	    URL = request.getRequestURL().toString();
-	}
-	return new OAuthMessage(request.getMethod(), URL,
-		getParameters(request));
+        if (URL == null) {
+            URL = request.getRequestURL().toString();
+        }
+        return new OAuthMessage(request.getMethod(), URL,
+                getParameters(request));
     }
 
     /**
-         * Gather all the parameters, including OAuth Authorization headers and
-         * the usual request parameters in the query string and/or form encoded
-         * body. The header parameters come first, followed by the rest in the
-         * order they came from request.getParameterMap().
-         */
+     * Gather all the parameters, including OAuth Authorization headers and the
+     * usual request parameters in the query string and/or form encoded body.
+     * The header parameters come first, followed by the rest in the order they
+     * came from request.getParameterMap().
+     */
     private static List<Map.Entry<String, String>> getParameters(
-	    HttpServletRequest request) {
-	List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>();
-	for (Enumeration headers = request.getHeaders("Authorization"); headers
-		.hasMoreElements();) {
-	    String header = headers.nextElement().toString();
-	    for (OAuth.Parameter parameter : OAuthMessage
-		    .decodeAuthorization(header)) {
-		if (!parameter.getKey().equalsIgnoreCase("realm")) {
-		    list.add(parameter);
-		}
-	    }
-	}
-	for (Object e : request.getParameterMap().entrySet()) {
-	    Map.Entry entry = (Map.Entry) e;
-	    String name = entry.getKey().toString();
-	    for (String value : (String[]) entry.getValue()) {
-		list.add(new OAuth.Parameter(name, value));
-	    }
-	}
-	return list;
+            HttpServletRequest request) {
+        List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>();
+        for (Enumeration headers = request.getHeaders("Authorization"); headers
+                .hasMoreElements();) {
+            String header = headers.nextElement().toString();
+            for (OAuth.Parameter parameter : OAuthMessage
+                    .decodeAuthorization(header)) {
+                if (!parameter.getKey().equalsIgnoreCase("realm")) {
+                    list.add(parameter);
+                }
+            }
+        }
+        for (Object e : request.getParameterMap().entrySet()) {
+            Map.Entry entry = (Map.Entry) e;
+            String name = entry.getKey().toString();
+            for (String value : (String[]) entry.getValue()) {
+                list.add(new OAuth.Parameter(name, value));
+            }
+        }
+        return list;
     }
 
     /** Reconstruct the requested URL, complete with query string (if any). */
     public static String getRequestURL(HttpServletRequest request) {
-	StringBuffer url = request.getRequestURL();
-	String queryString = request.getQueryString();
-	if (queryString != null) {
-	    url.append("?").append(queryString);
-	}
-	return url.toString();
+        StringBuffer url = request.getRequestURL();
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            url.append("?").append(queryString);
+        }
+        return url.toString();
     }
 
     public static void handleException(HttpServletResponse response,
-	    Exception e, String realm) throws IOException, ServletException {
-	if (e instanceof OAuthProblemException) {
-	    OAuthProblemException problem = (OAuthProblemException) e;
-	    Integer httpCode = PROBLEM_TO_HTTP_CODE.get(problem.getProblem());
-	    if (httpCode == null) {
-		httpCode = SC_FORBIDDEN;
-	    }
-	    response.reset();
-	    response.setStatus(httpCode.intValue());
-	    OAuthMessage message = new OAuthMessage(null, null, problem
-		    .getParameters().entrySet());
-	    response.addHeader("WWW-Authenticate", message
-		    .getAuthorizationHeader(realm));
-	    sendForm(response, message.getParameters());
-	} else if (e instanceof IOException) {
-	    throw (IOException) e;
-	} else if (e instanceof ServletException) {
-	    throw (ServletException) e;
-	} else if (e instanceof RuntimeException) {
-	    throw (RuntimeException) e;
-	} else {
-	    throw new ServletException(e);
-	}
+            Exception e, String realm) throws IOException, ServletException {
+        if (e instanceof OAuthProblemException) {
+            OAuthProblemException problem = (OAuthProblemException) e;
+            Integer httpCode = PROBLEM_TO_HTTP_CODE.get(problem.getProblem());
+            if (httpCode == null) {
+                httpCode = SC_FORBIDDEN;
+            }
+            response.reset();
+            response.setStatus(httpCode.intValue());
+            OAuthMessage message = new OAuthMessage(null, null, problem
+                    .getParameters().entrySet());
+            response.addHeader("WWW-Authenticate", message
+                    .getAuthorizationHeader(realm));
+            sendForm(response, message.getParameters());
+        } else if (e instanceof IOException) {
+            throw (IOException) e;
+        } else if (e instanceof ServletException) {
+            throw (ServletException) e;
+        } else if (e instanceof RuntimeException) {
+            throw (RuntimeException) e;
+        } else {
+            throw new ServletException(e);
+        }
     }
 
     static final Integer SC_FORBIDDEN = new Integer(
-	    HttpServletResponse.SC_FORBIDDEN);
+            HttpServletResponse.SC_FORBIDDEN);
 
     static final Map<String, Integer> PROBLEM_TO_HTTP_CODE = new HashMap<String, Integer>();
     static {
-	Integer SC_BAD_REQUEST = new Integer(HttpServletResponse.SC_BAD_REQUEST);
-	Integer SC_SERVICE_UNAVAILABLE = new Integer(
-		HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-	PROBLEM_TO_HTTP_CODE.put("version_rejected", SC_BAD_REQUEST);
-	PROBLEM_TO_HTTP_CODE.put("parameter_absent", SC_BAD_REQUEST);
-	PROBLEM_TO_HTTP_CODE.put("parameter_rejected", SC_BAD_REQUEST);
-	PROBLEM_TO_HTTP_CODE.put("timestamp_refused", SC_BAD_REQUEST);
-	PROBLEM_TO_HTTP_CODE.put("signature_method_rejected", SC_BAD_REQUEST);
-	PROBLEM_TO_HTTP_CODE
-		.put("consumer_key_refused", SC_SERVICE_UNAVAILABLE);
+        Integer SC_BAD_REQUEST = new Integer(HttpServletResponse.SC_BAD_REQUEST);
+        Integer SC_SERVICE_UNAVAILABLE = new Integer(
+                HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        PROBLEM_TO_HTTP_CODE.put("version_rejected", SC_BAD_REQUEST);
+        PROBLEM_TO_HTTP_CODE.put("parameter_absent", SC_BAD_REQUEST);
+        PROBLEM_TO_HTTP_CODE.put("parameter_rejected", SC_BAD_REQUEST);
+        PROBLEM_TO_HTTP_CODE.put("timestamp_refused", SC_BAD_REQUEST);
+        PROBLEM_TO_HTTP_CODE.put("signature_method_rejected", SC_BAD_REQUEST);
+        PROBLEM_TO_HTTP_CODE
+                .put("consumer_key_refused", SC_SERVICE_UNAVAILABLE);
     }
 
     public static void sendForm(HttpServletResponse response,
-	    Iterable<? extends Map.Entry> parameters) throws IOException {
-	response.resetBuffer();
-	response.setContentType(OAuth.FORM_ENCODED + ";charset="
-		+ OAuth.ENCODING);
-	OAuth.formEncode(parameters, response.getOutputStream());
+            Iterable<? extends Map.Entry> parameters) throws IOException {
+        response.resetBuffer();
+        response.setContentType(OAuth.FORM_ENCODED + ";charset="
+                + OAuth.ENCODING);
+        OAuth.formEncode(parameters, response.getOutputStream());
     }
 
 }

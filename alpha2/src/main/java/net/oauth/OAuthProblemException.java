@@ -31,27 +31,31 @@ public class OAuthProblemException extends Exception {
     }
 
     public OAuthProblemException(String problem) {
-	super(problem);
-	parameters.put(OAUTH_PROBLEM, problem);
+        super(problem);
+        parameters.put(OAUTH_PROBLEM, problem);
     }
 
     private final Map<String, Object> parameters = new HashMap<String, Object>();
 
+    public void setParameter(String name, Object value) {
+        getParameters().put(name, value);
+    }
+
     public Map<String, Object> getParameters() {
-	return parameters;
+        return parameters;
     }
 
     public String getProblem() {
-	return (String) getParameters().get(OAUTH_PROBLEM);
+        return (String) getParameters().get(OAUTH_PROBLEM);
     }
 
     public int getHttpStatusCode() {
-	Object code = getParameters().get(HTTP_STATUS_CODE);
-	if (code == null) {
-	    return 0;
-	} else {
-	    return ((Number) code).intValue();
-	}
+        Object code = getParameters().get(HTTP_STATUS_CODE);
+        if (code == null) {
+            return 0;
+        } else {
+            return ((Number) code).intValue();
+        }
     }
 
     private static final long serialVersionUID = 1L;

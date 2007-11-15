@@ -28,35 +28,35 @@ class HMAC_SHA1 extends OAuthSignatureMethod {
 
     @Override
     protected String sign(String baseString) throws GeneralSecurityException,
-	    UnsupportedEncodingException {
-	String signature = base64Encode(getSignature(baseString));
-	return signature;
+            UnsupportedEncodingException {
+        String signature = base64Encode(getSignature(baseString));
+        return signature;
     }
 
     @Override
     protected boolean verify(String signature, String baseString)
-	    throws GeneralSecurityException, UnsupportedEncodingException {
-	byte[] expected = getSignature(baseString);
-	byte[] actual = decodeBase64(signature);
-	return Arrays.equals(expected, actual);
+            throws GeneralSecurityException, UnsupportedEncodingException {
+        byte[] expected = getSignature(baseString);
+        byte[] actual = decodeBase64(signature);
+        return Arrays.equals(expected, actual);
     }
 
     private byte[] getSignature(String baseString)
-	    throws GeneralSecurityException, UnsupportedEncodingException {
-	SecretKey key = null;
-	synchronized (this) {
-	    if (this.key == null) {
-		String keyString = OAuth.percentEncode(getConsumerSecret())
-			+ '&' + OAuth.percentEncode(getTokenSecret());
-		byte[] keyBytes = keyString.getBytes(ENCODING);
-		this.key = new SecretKeySpec(keyBytes, MAC_NAME);
-	    }
-	    key = this.key;
-	}
-	Mac mac = Mac.getInstance(MAC_NAME);
-	mac.init(key);
-	byte[] text = baseString.getBytes(ENCODING);
-	return mac.doFinal(text);
+            throws GeneralSecurityException, UnsupportedEncodingException {
+        SecretKey key = null;
+        synchronized (this) {
+            if (this.key == null) {
+                String keyString = OAuth.percentEncode(getConsumerSecret())
+                        + '&' + OAuth.percentEncode(getTokenSecret());
+                byte[] keyBytes = keyString.getBytes(ENCODING);
+                this.key = new SecretKeySpec(keyBytes, MAC_NAME);
+            }
+            key = this.key;
+        }
+        Mac mac = Mac.getInstance(MAC_NAME);
+        mac.init(key);
+        byte[] text = baseString.getBytes(ENCODING);
+        return mac.doFinal(text);
     }
 
     /** ISO-8859-1 or US-ASCII would work, too. */
@@ -68,18 +68,18 @@ class HMAC_SHA1 extends OAuthSignatureMethod {
 
     @Override
     public void setConsumerSecret(String consumerSecret) {
-	synchronized (this) {
-	    key = null;
-	}
-	super.setConsumerSecret(consumerSecret);
+        synchronized (this) {
+            key = null;
+        }
+        super.setConsumerSecret(consumerSecret);
     }
 
     @Override
     public void setTokenSecret(String tokenSecret) {
-	synchronized (this) {
-	    key = null;
-	}
-	super.setTokenSecret(tokenSecret);
+        synchronized (this) {
+            key = null;
+        }
+        super.setTokenSecret(tokenSecret);
     }
 
 }

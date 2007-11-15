@@ -22,39 +22,39 @@ class PLAINTEXT extends OAuthSignatureMethod {
 
     @Override
     public String sign(String baseString) {
-	return getSignature();
+        return getSignature();
     }
 
     @Override
     protected boolean verify(String signature, String baseString)
-	    throws Exception {
-	return signature.equals(getSignature());
+            throws Exception {
+        return signature.equals(getSignature());
     }
 
     private synchronized String getSignature() {
-	if (signature == null) {
-	    signature = OAuth.percentEncode(getConsumerSecret()) + '&'
-		    + OAuth.percentEncode(getTokenSecret());
-	}
-	return signature;
+        if (signature == null) {
+            signature = OAuth.percentEncode(getConsumerSecret()) + '&'
+                    + OAuth.percentEncode(getTokenSecret());
+        }
+        return signature;
     }
 
     private String signature = null;
 
     @Override
     public void setConsumerSecret(String consumerSecret) {
-	synchronized (this) {
-	    signature = null;
-	}
-	super.setConsumerSecret(consumerSecret);
+        synchronized (this) {
+            signature = null;
+        }
+        super.setConsumerSecret(consumerSecret);
     }
 
     @Override
     public void setTokenSecret(String tokenSecret) {
-	synchronized (this) {
-	    signature = null;
-	}
-	super.setTokenSecret(tokenSecret);
+        synchronized (this) {
+            signature = null;
+        }
+        super.setTokenSecret(tokenSecret);
     }
 
 }
