@@ -33,13 +33,16 @@ public class OAuthServlet {
 
     /**
      * Extract the parts of the given request that are relevant to OAuth.
+     * Parameters include OAuth Authorization headers and the usual request
+     * parameters in the query string and/or form encoded body. The header
+     * parameters come first, followed by the rest in the order they came from
+     * request.getParameterMap().
      * 
      * @param URL
      *            the official URL of this service; that is the URL a legitimate
-     *            client would have used to compute the digital signature. If
-     *            this parameter is null, this method will try to reconstruct
-     *            the URL from the HTTP request; which may be wrong in some
-     *            cases.
+     *            client would use to compute the digital signature. If this
+     *            parameter is null, this method will try to reconstruct the URL
+     *            from the HTTP request; which may be wrong in some cases.
      */
     public static OAuthMessage getMessage(HttpServletRequest request, String URL) {
         if (URL == null) {
@@ -49,12 +52,6 @@ public class OAuthServlet {
                 getParameters(request));
     }
 
-    /**
-     * Gather all the parameters, including OAuth Authorization headers and the
-     * usual request parameters in the query string and/or form encoded body.
-     * The header parameters come first, followed by the rest in the order they
-     * came from request.getParameterMap().
-     */
     private static List<Map.Entry<String, String>> getParameters(
             HttpServletRequest request) {
         List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>();
@@ -114,10 +111,10 @@ public class OAuthServlet {
         }
     }
 
-    static final Integer SC_FORBIDDEN = new Integer(
+    private static final Integer SC_FORBIDDEN = new Integer(
             HttpServletResponse.SC_FORBIDDEN);
 
-    static final Map<String, Integer> PROBLEM_TO_HTTP_CODE = new HashMap<String, Integer>();
+    private static final Map<String, Integer> PROBLEM_TO_HTTP_CODE = new HashMap<String, Integer>();
     static {
         Integer SC_BAD_REQUEST = new Integer(HttpServletResponse.SC_BAD_REQUEST);
         Integer SC_SERVICE_UNAVAILABLE = new Integer(
@@ -131,6 +128,7 @@ public class OAuthServlet {
                 .put("consumer_key_refused", SC_SERVICE_UNAVAILABLE);
     }
 
+    /** Send the given parameters as a form-encoded response body. */
     public static void sendForm(HttpServletResponse response,
             Iterable<? extends Map.Entry> parameters) throws IOException {
         response.resetBuffer();

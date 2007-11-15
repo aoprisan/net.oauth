@@ -19,6 +19,11 @@ package net.oauth;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Describes an OAuth-related problem, using a set of named parameters. One
+ * parameter identifies the basic problem, and the others provide supplementary
+ * diagnostic information.
+ */
 public class OAuthProblemException extends Exception {
 
     public static final String OAUTH_PROBLEM = "oauth_problem";
@@ -54,7 +59,7 @@ public class OAuthProblemException extends Exception {
         if (code == null) {
             return 0;
         } else {
-            return ((Number) code).intValue();
+            return Integer.parseInt(code.toString());
         }
     }
 

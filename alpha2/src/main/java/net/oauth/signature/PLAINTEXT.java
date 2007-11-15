@@ -21,12 +21,12 @@ import net.oauth.OAuth;
 class PLAINTEXT extends OAuthSignatureMethod {
 
     @Override
-    public String sign(String baseString) {
+    public String getSignature(String baseString) {
         return getSignature();
     }
 
     @Override
-    protected boolean verify(String signature, String baseString)
+    protected boolean isValid(String signature, String baseString)
             throws Exception {
         return signature.equals(getSignature());
     }

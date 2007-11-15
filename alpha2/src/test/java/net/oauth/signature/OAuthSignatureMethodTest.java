@@ -135,7 +135,7 @@ public class OAuthSignatureMethodTest extends TestCase {
             OAuthSignatureMethod method = OAuthSignatureMethod.newMethod(
                     methodName, consumer);
             method.setTokenSecret(tokenSecret);
-            String actual = method.sign(baseString);
+            String actual = method.getSignature(baseString);
             if (!expected.equals(actual)) {
                 if (errors.length() > 0)
                     errors.append(", ");
@@ -147,7 +147,7 @@ public class OAuthSignatureMethodTest extends TestCase {
             consumer.setProperty(OAuthConsumer.ACCESSOR_SECRET, consumerSecret);
             method = OAuthSignatureMethod.newMethod(methodName, consumer);
             method.setTokenSecret(tokenSecret);
-            actual = method.sign(baseString);
+            actual = method.getSignature(baseString);
             if (!expected.equals(actual)) {
                 if (errors.length() > 0)
                     errors.append(", ");

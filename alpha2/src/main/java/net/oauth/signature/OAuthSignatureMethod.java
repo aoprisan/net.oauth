@@ -32,20 +32,23 @@ import org.apache.commons.codec.binary.Base64;
 /** A pair of algorithms for computing and verifying an OAuth digital signature. */
 public abstract class OAuthSignatureMethod {
 
+    /** Add a signature to the message. */
     public void sign(OAuthMessage message) throws Exception {
         message.addParameter(new OAuth.Parameter("oauth_signature",
                 getSignature(message)));
     }
 
     /**
+     * Check whether the message has a valid signature.
+     * 
      * @throws OAuthProblemException
-     *             the signature is invalid.
+     *             the signature is invalid
      */
-    public void verify(OAuthMessage message) throws Exception {
+    public void validate(OAuthMessage message) throws Exception {
         message.requireParameters("oauth_signature");
         String signature = message.getSignature();
         String baseString = getBaseString(message);
-        if (!verify(signature, baseString)) {
+        if (!isValid(signature, baseString)) {
             OAuthProblemException problem = new OAuthProblemException(
                     "signature_invalid");
             problem.setParameter("oauth_signature", signature);
@@ -55,7 +58,7 @@ public abstract class OAuthSignatureMethod {
     }
 
     protected String getSignature(OAuthMessage message) throws Exception {
-        return sign(getBaseString(message));
+        return getSignature(getBaseString(message));
     }
 
     protected void initialize(String name, OAuthConsumer consumer)
@@ -74,26 +77,24 @@ public abstract class OAuthSignatureMethod {
         setConsumerSecret(secret);
     }
 
-    /** Compute the signature for the given base string. */
-    protected abstract String sign(String baseString) throws Exception;
+    public static final String _ACCESSOR = "-Accessor";
 
-    /**
-     * Decide whether a signature is correct.
-     * 
-     * @returns true only if the signature is correct.
-     */
-    protected abstract boolean verify(String signature, String baseString)
+    /** Compute the signature for the given base string. */
+    protected abstract String getSignature(String baseString) throws Exception;
+
+    /** Decide whether the signature is valid. */
+    protected abstract boolean isValid(String signature, String baseString)
             throws Exception;
 
     private String consumerSecret;
 
     private String tokenSecret;
 
-    public String getConsumerSecret() {
+    protected String getConsumerSecret() {
         return consumerSecret;
     }
 
-    public void setConsumerSecret(String consumerSecret) {
+    protected void setConsumerSecret(String consumerSecret) {
         this.consumerSecret = consumerSecret;
     }
 
@@ -105,7 +106,7 @@ public abstract class OAuthSignatureMethod {
         this.tokenSecret = tokenSecret;
     }
 
-    public String getBaseString(OAuthMessage message) throws IOException {
+    protected String getBaseString(OAuthMessage message) throws IOException {
         return OAuth.percentEncode(message.httpMethod)
                 + '&'
                 + OAuth.percentEncode(message.URL)
@@ -116,8 +117,8 @@ public abstract class OAuthSignatureMethod {
                 + OAuth.percentEncode(getTokenSecret());
     }
 
-    public String normalizeParameters(Collection<? extends Map.Entry> parameters)
-            throws IOException {
+    protected String normalizeParameters(
+            Collection<? extends Map.Entry> parameters) throws IOException {
         if (parameters == null) {
             return "";
         }
@@ -163,14 +164,12 @@ public abstract class OAuthSignatureMethod {
     }
 
     /**
-     * Subsequently, newMethod(name) will attempt to instantiate the given class
-     * (with no constructor parameters).
+     * Subsequently, newMethod(name) will attempt to instantiate the given
+     * class, with no constructor parameters.
      */
     public static void registerMethodClass(String name, Class clazz) {
         NAME_TO_CLASS.put(name, clazz);
     }
-
-    public static final String _ACCESSOR = "-Accessor";
 
     private static final Map<String, Class> NAME_TO_CLASS = new ConcurrentHashMap<String, Class>();
     static {
@@ -180,18 +179,7 @@ public abstract class OAuthSignatureMethod {
         registerMethodClass("PLAINTEXT" + _ACCESSOR, PLAINTEXT.class);
     }
 
-    private static List<Map.Entry> getParameters(
-            Collection<ComparableParameter> parameters) {
-        if (parameters == null) {
-            return null;
-        }
-        List<Map.Entry> list = new ArrayList<Map.Entry>(parameters.size());
-        for (ComparableParameter parameter : parameters) {
-            list.add(parameter.value);
-        }
-        return list;
-    }
-
+    /** An efficiently sortable wrapper around a parameter. */
     private static class ComparableParameter implements
             Comparable<ComparableParameter> {
 
@@ -200,13 +188,15 @@ public abstract class OAuthSignatureMethod {
             String n = toString(value.getKey());
             String v = toString(value.getValue());
             this.key = OAuth.percentEncode(n) + ' ' + OAuth.percentEncode(v);
+            // ' ' is used because it comes before any character
+            // that can appear in a percentEncoded string.
         }
 
         final Map.Entry value;
 
         private final String key;
 
-        private static final String toString(Object from) {
+        private static String toString(Object from) {
             return (from == null) ? null : from.toString();
         }
 
@@ -219,6 +209,19 @@ public abstract class OAuthSignatureMethod {
             return key;
         }
 
+    }
+
+    /** Retrieve the original parameters from a sorted collection. */
+    private static List<Map.Entry> getParameters(
+            Collection<ComparableParameter> parameters) {
+        if (parameters == null) {
+            return null;
+        }
+        List<Map.Entry> list = new ArrayList<Map.Entry>(parameters.size());
+        for (ComparableParameter parameter : parameters) {
+            list.add(parameter.value);
+        }
+        return list;
     }
 
 }

@@ -19,6 +19,10 @@ package net.oauth;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Properties of an OAuth Consumer. Properties may be added freely, e.g. to
+ * support extensions.
+ */
 public class OAuthConsumer {
 
     public final String callbackURL;

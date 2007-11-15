@@ -31,8 +31,10 @@ import org.apache.commons.httpclient.HttpStatus;
 public class OAuthHttpClient {
 
     /**
-     * Check whether a response indicates an problem. If so, throw an
-     * OAuthProblemException.
+     * Check whether a response indicates a problem.
+     * 
+     * @throws OAuthProblemException
+     *             the response indicates a problem
      */
     public static void checkResponse(HttpMethod method) throws IOException,
             OAuthProblemException {
@@ -75,11 +77,6 @@ public class OAuthHttpClient {
                 getResponseParameters(method));
     }
 
-    /**
-     * Gather all the response parameters, including OAuth WWW-Authenticate
-     * headers and parameters from the body. The header parameters come first,
-     * followed by the ones from the body.
-     */
     private static List<OAuth.Parameter> getResponseParameters(HttpMethod method)
             throws IOException {
         List<OAuth.Parameter> list = new ArrayList<OAuth.Parameter>();

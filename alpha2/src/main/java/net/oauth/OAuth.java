@@ -35,6 +35,7 @@ public class OAuth {
     /** The MIME type for a sequence of OAuth parameters. */
     public static final String FORM_ENCODED = "application/x-www-form-urlencoded";
 
+    /** Return true if the given Content-Type header means FORM_ENCODED. */
     public static boolean isFormEncoded(String contentType) {
         if (contentType == null) {
             return false;
@@ -46,6 +47,11 @@ public class OAuth {
         return FORM_ENCODED.equalsIgnoreCase(contentType.trim());
     }
 
+    /**
+     * Construct a form-urlencoded document containing the given sequence of
+     * name/value pairs. Use OAuth percent encoding (not exactly the encoding
+     * mandated by HTTP).
+     */
     public static String formEncode(Iterable<? extends Map.Entry> parameters)
             throws IOException {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -53,6 +59,10 @@ public class OAuth {
         return new String(b.toByteArray());
     }
 
+    /**
+     * Write a form-urlencoded document into the given stream, containing the
+     * given sequence of name/value pairs.
+     */
     public static void formEncode(Iterable<? extends Map.Entry> parameters,
             OutputStream into) throws IOException {
         if (parameters != null) {
@@ -72,6 +82,7 @@ public class OAuth {
         }
     }
 
+    /** Parse a form-urlencoded document. */
     public static List<Parameter> decodeForm(String form) {
         List<Parameter> list = new ArrayList<Parameter>();
         if (form != null) {
@@ -92,6 +103,7 @@ public class OAuth {
         return list;
     }
 
+    /** Construct a &-separated list of the given values, percentEncoded. */
     public static String percentEncode(Iterable values) {
         StringBuilder p = new StringBuilder();
         for (Object v : values) {
@@ -128,7 +140,7 @@ public class OAuth {
     }
 
     /**
-     * Construct a Map containing the a copy of the given parameters. If several
+     * Construct a Map containing a copy of the given parameters. If several
      * parameters have the same name, the Map will contain the first value,
      * only.
      */
@@ -154,6 +166,7 @@ public class OAuth {
         return list;
     }
 
+    /** A name/value pair. */
     public static class Parameter implements Map.Entry<String, String> {
 
         public Parameter(String key, String value) {
@@ -191,6 +204,10 @@ public class OAuth {
         return (from == null) ? null : from.toString();
     }
 
+    /**
+     * Construct a URL like the given one, but with the given parameters added
+     * to its query string.
+     */
     public static String addParameters(String url, String... parameters)
             throws IOException {
         String form = formEncode(newList(parameters));

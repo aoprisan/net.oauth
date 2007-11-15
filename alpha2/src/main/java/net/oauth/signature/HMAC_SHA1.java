@@ -27,21 +27,21 @@ import net.oauth.OAuth;
 class HMAC_SHA1 extends OAuthSignatureMethod {
 
     @Override
-    protected String sign(String baseString) throws GeneralSecurityException,
-            UnsupportedEncodingException {
-        String signature = base64Encode(getSignature(baseString));
+    protected String getSignature(String baseString)
+            throws GeneralSecurityException, UnsupportedEncodingException {
+        String signature = base64Encode(computeSignature(baseString));
         return signature;
     }
 
     @Override
-    protected boolean verify(String signature, String baseString)
+    protected boolean isValid(String signature, String baseString)
             throws GeneralSecurityException, UnsupportedEncodingException {
-        byte[] expected = getSignature(baseString);
+        byte[] expected = computeSignature(baseString);
         byte[] actual = decodeBase64(signature);
         return Arrays.equals(expected, actual);
     }
 
-    private byte[] getSignature(String baseString)
+    private byte[] computeSignature(String baseString)
             throws GeneralSecurityException, UnsupportedEncodingException {
         SecretKey key = null;
         synchronized (this) {

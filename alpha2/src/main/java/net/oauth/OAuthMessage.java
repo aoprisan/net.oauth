@@ -120,7 +120,36 @@ public class OAuthMessage {
         }
     }
 
-    /** Construct a WWW-Authenticate or Authentication header value. */
+    /** Add a signature to the message. */
+    public void sign(OAuthConsumer consumer, String tokenSecret)
+            throws Exception {
+        getSigner(consumer, tokenSecret).sign(this);
+    }
+
+    /**
+     * Check that the message has a valid signature.
+     * 
+     * @throws OAuthProblemException
+     *             the signature is invalid
+     */
+    public void verifySignature(OAuthConsumer consumer, String tokenSecret)
+            throws Exception {
+        getSigner(consumer, tokenSecret).validate(this);
+    }
+
+    private OAuthSignatureMethod getSigner(OAuthConsumer consumer,
+            String tokenSecret) throws Exception {
+        requireParameters("oauth_signature_method");
+        OAuthSignatureMethod signer = OAuthSignatureMethod.newMethod(
+                getSignatureMethod(), consumer);
+        signer.setTokenSecret(tokenSecret);
+        return signer;
+    }
+
+    /**
+     * Construct a WWW-Authenticate or Authentication header value, containing
+     * the given realm plus all the parameters whose names begin with "oauth_".
+     */
     public String getAuthorizationHeader(String realm) {
         StringBuilder into = new StringBuilder(AUTH_SCHEME);
         into.append(" realm=\"").append(OAuth.percentEncode(realm)).append('"');
@@ -137,25 +166,6 @@ public class OAuthMessage {
             }
         }
         return into.toString();
-    }
-
-    public void sign(OAuthConsumer consumer, String tokenSecret)
-            throws Exception {
-        getSigner(consumer, tokenSecret).sign(this);
-    }
-
-    public void verifySignature(OAuthConsumer consumer, String tokenSecret)
-            throws Exception {
-        getSigner(consumer, tokenSecret).verify(this);
-    }
-
-    private OAuthSignatureMethod getSigner(OAuthConsumer consumer,
-            String tokenSecret) throws Exception {
-        requireParameters("oauth_signature_method");
-        OAuthSignatureMethod signer = OAuthSignatureMethod.newMethod(
-                getSignatureMethod(), consumer);
-        signer.setTokenSecret(tokenSecret);
-        return signer;
     }
 
     /**
