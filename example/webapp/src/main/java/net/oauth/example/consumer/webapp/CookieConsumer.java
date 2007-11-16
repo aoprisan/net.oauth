@@ -18,6 +18,8 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -261,6 +263,14 @@ public class CookieConsumer {
                     handleException(e2, request, response, null);
                 }
             } else {
+                try {
+                    StringWriter s = new StringWriter();
+                    PrintWriter pw = new PrintWriter(s);
+                    e.printStackTrace(pw);
+                    pw.flush();
+                    p.setParameter("stack trace", s.toString());
+                } catch (Exception rats) {
+                }
                 response.setStatus(p.getHttpStatusCode());
                 response.resetBuffer();
                 request.setAttribute("OAuthProblemException", p);

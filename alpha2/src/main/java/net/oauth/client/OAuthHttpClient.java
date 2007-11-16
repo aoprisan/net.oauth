@@ -88,6 +88,9 @@ public class OAuthHttpClient {
             }
             problem.put("HTTP response", response.toString());
         }
+        for (OAuth.Parameter p : getResponseParameters(method, responseBody)) {
+            problem.put(p.getKey(), p.getValue());
+        }
         return problem;
     }
 
@@ -99,11 +102,11 @@ public class OAuthHttpClient {
     public static OAuthMessage getResponseMessage(HttpMethod method)
             throws IOException {
         return new OAuthMessage(method.getName(), method.getURI().toString(),
-                getResponseParameters(method));
+                getResponseParameters(method, null));
     }
 
-    private static List<OAuth.Parameter> getResponseParameters(HttpMethod method)
-            throws IOException {
+    private static List<OAuth.Parameter> getResponseParameters(
+            HttpMethod method, String responseBody) throws IOException {
         List<OAuth.Parameter> list = new ArrayList<OAuth.Parameter>();
         for (Header header : method.getResponseHeaders("WWW-Authenticate")) {
             for (OAuth.Parameter parameter : OAuthMessage
@@ -113,7 +116,10 @@ public class OAuthHttpClient {
                 }
             }
         }
-        list.addAll(OAuth.decodeForm(method.getResponseBodyAsString()));
+        if (responseBody == null) {
+            responseBody = method.getResponseBodyAsString();
+        }
+        list.addAll(OAuth.decodeForm(responseBody));
         return list;
     }
 
