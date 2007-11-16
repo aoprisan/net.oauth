@@ -17,6 +17,7 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +34,7 @@ import net.oauth.OAuth;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.OAuthServiceProvider;
 import net.oauth.client.OAuthHttpClient;
 import net.oauth.server.OAuthServlet;
 import org.apache.commons.httpclient.HttpClient;
@@ -57,6 +61,53 @@ public class CookieConsumer {
             return new HttpClient();
         }
     };
+
+    private static Properties consumerProperties = null;
+
+    public static synchronized OAuthConsumer newConsumer(String name,
+            ServletConfig config) throws IOException {
+        Properties p = null;
+        synchronized (CookieConsumer.class) {
+            p = consumerProperties;
+            if (p == null) {
+                p = new Properties();
+                String resourceName = "/"
+                        + CookieConsumer.class.getPackage().getName().replace(
+                                ".", "/") + "/consumer.properties";
+                URL resource = CookieConsumer.class.getClassLoader()
+                        .getResource(resourceName);
+                if (resource == null) {
+                    throw new IOException("resource not found: " + resourceName);
+                }
+                InputStream stream = resource.openStream();
+                try {
+                    p.load(stream);
+                } finally {
+                    stream.close();
+                }
+            }
+            consumerProperties = p;
+        }
+        OAuthServiceProvider serviceProvider = new OAuthServiceProvider(p
+                .getProperty(name + ".serviceProvider.requestTokenURL"), p
+                .getProperty(name + ".serviceProvider.userAuthorizationURL"), p
+                .getProperty(name + ".serviceProvider.accessTokenURL"));
+        String callbackURL = p.getProperty(name + ".callbackURL");
+        if (callbackURL == null) {
+            URL resource = config.getServletContext()
+                    .getResource(Callback.PATH);
+            if (resource != null) {
+                callbackURL = resource.toExternalForm();
+            } else {
+                callbackURL = Callback.PATH;
+            }
+        }
+        OAuthConsumer consumer = new OAuthConsumer(callbackURL //
+                , p.getProperty(name + ".consumerKey") //
+                , p.getProperty(name + ".consumerSecret"), serviceProvider);
+        consumer.setProperty("name", name);
+        return consumer;
+    }
 
     /**
      * Get the access token and token secret for the given consumer. Get them
@@ -179,7 +230,8 @@ public class CookieConsumer {
             method.setFollowRedirects(false);
         } else {
             PostMethod post = new PostMethod(url);
-            post.setRequestEntity(new StringRequestEntity(form, OAuth.FORM_ENCODED, null));
+            post.setRequestEntity(new StringRequestEntity(form,
+                    OAuth.FORM_ENCODED, null));
             method = post;
         }
         httpClientPool.getHttpClient(new URL(method.getURI().toString()))

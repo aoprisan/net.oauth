@@ -25,37 +25,31 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuth;
 import net.oauth.OAuthConsumer;
-import net.oauth.OAuthServiceProvider;
 import org.apache.commons.httpclient.HttpMethod;
 
 /** A trivial consumer of the 'tags' service at Ma.gnolia. */
 public class MagnoliaConsumer extends HttpServlet {
 
-    private static final OAuthServiceProvider SERVICE_PROVIDER = new OAuthServiceProvider //
-    ("http://ma.gnolia.com/oauth/get_request_token", //
-            "http://ma.gnolia.com/oauth/authorize", //
-            "http://ma.gnolia.com/oauth/get_access_token");
-
-    public static final OAuthConsumer CONSUMER = new OAuthConsumer //
-    (Callback.PATH, "f41KLKeuQxPqcjMe", "bAAP5UdgI2AmxTJQmf8PJD2qypAaImQD",
-            SERVICE_PROVIDER);
-    static {
-        CONSUMER.setProperty("name", "ma.gnolia");
-    }
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CookieConsumer.ALL_CONSUMERS.add(CONSUMER);
+        try {
+            consumer = CookieConsumer.newConsumer("ma.gnolia", config);
+            CookieConsumer.ALL_CONSUMERS.add(consumer);
+        } catch (IOException e) {
+            throw new ServletException(e);
+        }
     }
+
+    private OAuthConsumer consumer;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         try {
             CookieMap credentials = CookieConsumer.getCredentials(request,
-                    response, CONSUMER);
-            HttpMethod result = CookieConsumer.invoke(CONSUMER, credentials,
+                    response, consumer);
+            HttpMethod result = CookieConsumer.invoke(consumer, credentials,
                     "http://ma.gnolia.com/api/rest/2/tags_find", //
                     OAuth.newList("person", System.getProperty("user.name")));
             String responseBody = result.getResponseBodyAsString();
@@ -64,7 +58,7 @@ public class MagnoliaConsumer extends HttpServlet {
             out.println("ma.gnolia said:");
             out.print(responseBody);
         } catch (Exception e) {
-            CookieConsumer.handleException(e, request, response, CONSUMER);
+            CookieConsumer.handleException(e, request, response, consumer);
         }
     }
 

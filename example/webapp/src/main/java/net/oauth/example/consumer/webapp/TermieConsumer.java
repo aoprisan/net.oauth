@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuth;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
-import net.oauth.OAuthServiceProvider;
 import net.oauth.server.OAuthServlet;
 import org.apache.commons.httpclient.HttpMethod;
 
@@ -35,30 +34,25 @@ public class TermieConsumer extends HttpServlet {
 
     private static final String NAME = "term.ie";
 
-    private static final OAuthServiceProvider SERVICE_PROVIDER = new OAuthServiceProvider //
-    ("http://term.ie/oauth/example/request_token.php" //
-            // user authorization is not required:
-            , UserAuthorizationStub.PATH //
-            , "http://term.ie/oauth/example/access_token.php");
-
-    public static final OAuthConsumer CONSUMER = new OAuthConsumer //
-    ("- not used -", "key", "secret", SERVICE_PROVIDER);
-    static {
-        CONSUMER.setProperty("name", NAME);
-    }
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CookieConsumer.ALL_CONSUMERS.add(CONSUMER);
+        try {
+            consumer = CookieConsumer.newConsumer(NAME, config);
+            CookieConsumer.ALL_CONSUMERS.add(consumer);
+        } catch (IOException e) {
+            throw new ServletException(e);
+        }
     }
+
+    private OAuthConsumer consumer;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         try {
             CookieMap credentials = CookieConsumer.getCredentials(request,
-                    response, CONSUMER);
+                    response, consumer);
             String accessToken = credentials.get(NAME + ".accessToken");
             String tokenSecret = credentials.get(NAME + ".tokenSecret");
             OAuthMessage message = OAuthServlet.getMessage(request, null);
@@ -72,13 +66,13 @@ public class TermieConsumer extends HttpServlet {
             out.println(invoke(tokenSecret, message));
             out.println(invoke(tokenSecret, message));
         } catch (Exception e) {
-            CookieConsumer.handleException(e, request, response, CONSUMER);
+            CookieConsumer.handleException(e, request, response, consumer);
         }
     }
 
-    private static String invoke(String tokenSecret, OAuthMessage message)
+    private String invoke(String tokenSecret, OAuthMessage message)
             throws Exception {
-        HttpMethod result = CookieConsumer.invoke(CONSUMER,
+        HttpMethod result = CookieConsumer.invoke(consumer,
                 "http://term.ie/oauth/example/echo_api.php", tokenSecret,
                 message.getParameters());
         String responseBody = result.getResponseBodyAsString();

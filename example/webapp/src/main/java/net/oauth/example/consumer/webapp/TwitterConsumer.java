@@ -24,39 +24,33 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuthConsumer;
-import net.oauth.OAuthServiceProvider;
 import org.apache.commons.httpclient.HttpMethod;
 
 /** A trivial consumer of the 'friends_timeline' service at Twitter. */
 public class TwitterConsumer extends HttpServlet {
 
-    private static final OAuthServiceProvider SERVICE_PROVIDER = new OAuthServiceProvider //
-    ("http://twitter.com/oauth/request_token", //
-            "http://twitter.com/oauth/authorize", //
-            "http://twitter.com/oauth/access_token");
-
-    public static final OAuthConsumer CONSUMER = new OAuthConsumer //
-    (Callback.PATH, "68wbb4edygtm", "3lp4lakz5t7ogew3umgpg9k2z6anujj0",
-            SERVICE_PROVIDER);
-    static {
-        CONSUMER.setProperty("name", "twitter");
-    }
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CookieConsumer.ALL_CONSUMERS.add(CONSUMER);
+        try {
+            consumer = CookieConsumer.newConsumer("twitter", config);
+            CookieConsumer.ALL_CONSUMERS.add(consumer);
+        } catch (IOException e) {
+            throw new ServletException(e);
+        }
     }
+
+    private OAuthConsumer consumer;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         try {
             CookieMap credentials = CookieConsumer.getCredentials(request,
-                    response, CONSUMER);
+                    response, consumer);
             HttpMethod result = CookieConsumer
                     .invoke(
-                            CONSUMER,
+                            consumer,
                             credentials,
                             "http://twitter.com/statuses/friends_timeline/jmkristian.xml",
                             null);
@@ -66,7 +60,7 @@ public class TwitterConsumer extends HttpServlet {
             out.println("twitter said:");
             out.print(responseBody);
         } catch (Exception e) {
-            CookieConsumer.handleException(e, request, response, CONSUMER);
+            CookieConsumer.handleException(e, request, response, consumer);
         }
     }
 
