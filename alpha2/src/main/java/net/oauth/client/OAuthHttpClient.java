@@ -41,34 +41,53 @@ public class OAuthHttpClient {
             OAuthProblemException {
         int statusCode = method.getStatusCode();
         if (statusCode != HttpStatus.SC_OK) {
-            Map<String, Object> etc = getProblem(method, null);
-            String message = (String) etc
-                    .get(OAuthProblemException.OAUTH_PROBLEM);
-            OAuthProblemException problem = new OAuthProblemException(message);
+            Map<String, String> etc = getExchange(method, null);
+            OAuthProblemException problem = new OAuthProblemException(
+                    (String) etc.get(OAuthProblemException.OAUTH_PROBLEM));
             problem.getParameters().putAll(etc);
             throw problem;
         }
     }
 
-    public static Map<String, Object> getProblem(HttpMethod method,
+    /**
+     * Return a complete description of the HTTP exchange, represented by
+     * strings named "URL", "HTTP request headers" and "HTTP response".
+     */
+    public static Map<String, String> getExchange(HttpMethod method,
             String responseBody) throws IOException {
-        Map<String, Object> problem = new HashMap<String, Object>();
+        Map<String, String> problem = new HashMap<String, String>();
         problem.put("URL", method.getURI().toString());
-        StringBuilder response = new StringBuilder(method.getStatusLine()
-                .toString());
-        response.append("\n");
-        for (Header header : method.getResponseHeaders()) {
-            response.append(header.getName()).append(": ").append(
-                    header.getValue()).append("\n");
+        {
+            StringBuilder request = new StringBuilder(method.getName());
+            request.append(" ").append(method.getPath());
+            String query = method.getQueryString();
+            if (query != null && query.length() > 0) {
+                request.append("?").append(query);
+            }
+            request.append("\n");
+            for (Header header : method.getRequestHeaders()) {
+                request.append(header.getName()).append(": ").append(
+                        header.getValue()).append("\n");
+            }
+            problem.put("HTTP request headers", request.toString());
         }
-        if (responseBody == null) {
-            responseBody = method.getResponseBodyAsString();
-        }
-        if (responseBody != null) {
+        {
+            StringBuilder response = new StringBuilder(method.getStatusLine()
+                    .toString());
             response.append("\n");
-            response.append(responseBody);
+            for (Header header : method.getResponseHeaders()) {
+                response.append(header.getName()).append(": ").append(
+                        header.getValue()).append("\n");
+            }
+            if (responseBody == null) {
+                responseBody = method.getResponseBodyAsString();
+            }
+            if (responseBody != null) {
+                response.append("\n");
+                response.append(responseBody);
+            }
+            problem.put("HTTP response", response.toString());
         }
-        problem.put("HTTP response", response);
         return problem;
     }
 

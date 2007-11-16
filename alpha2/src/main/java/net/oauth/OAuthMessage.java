@@ -104,18 +104,17 @@ public class OAuthMessage {
      */
     public void requireParameters(String... names) throws OAuthProblemException {
         Set<String> present = getParameterMap().keySet();
-        StringBuilder absent = new StringBuilder();
+        List<String> absent = new ArrayList<String>();
         for (String required : names) {
             if (!present.contains(required)) {
-                if (absent.length() > 0)
-                    absent.append('&');
-                absent.append(OAuth.percentEncode(required));
+                absent.add(required);
             }
         }
-        if (absent.length() > 0) {
+        if (!absent.isEmpty()) {
             OAuthProblemException problem = new OAuthProblemException(
                     "parameter_absent");
-            problem.setParameter("oauth_parameters_absent", absent.toString());
+            problem.setParameter("oauth_parameters_absent", OAuth
+                    .percentEncode(absent));
             throw problem;
         }
     }

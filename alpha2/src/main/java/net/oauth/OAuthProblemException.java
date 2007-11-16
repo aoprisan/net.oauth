@@ -35,7 +35,9 @@ public class OAuthProblemException extends Exception {
 
     public OAuthProblemException(String problem) {
         super(problem);
-        parameters.put(OAUTH_PROBLEM, problem);
+        if (problem != null) {
+            parameters.put(OAUTH_PROBLEM, problem);
+        }
     }
 
     private final Map<String, Object> parameters = new HashMap<String, Object>();
