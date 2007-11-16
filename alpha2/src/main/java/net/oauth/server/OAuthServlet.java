@@ -89,12 +89,16 @@ public class OAuthServlet {
             Exception e, String realm) throws IOException, ServletException {
         if (e instanceof OAuthProblemException) {
             OAuthProblemException problem = (OAuthProblemException) e;
-            Integer httpCode = PROBLEM_TO_HTTP_CODE.get(problem.getProblem());
+            Object httpCode = problem.getParameters().get(
+                    OAuthProblemException.HTTP_STATUS_CODE);
+            if (httpCode == null) {
+                httpCode = PROBLEM_TO_HTTP_CODE.get(problem.getProblem());
+            }
             if (httpCode == null) {
                 httpCode = SC_FORBIDDEN;
             }
             response.reset();
-            response.setStatus(httpCode.intValue());
+            response.setStatus(Integer.parseInt(httpCode.toString()));
             OAuthMessage message = new OAuthMessage(null, null, problem
                     .getParameters().entrySet());
             response.addHeader("WWW-Authenticate", message

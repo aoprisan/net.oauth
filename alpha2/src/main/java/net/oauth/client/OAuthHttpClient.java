@@ -18,6 +18,7 @@ package net.oauth.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.oauth.OAuth;
@@ -40,30 +41,35 @@ public class OAuthHttpClient {
             OAuthProblemException {
         int statusCode = method.getStatusCode();
         if (statusCode != HttpStatus.SC_OK) {
-            String statusText = method.getStatusText();
-            Map<String, String> parameters = OAuth
-                    .newMap(getResponseParameters(method));
-            String message = parameters
+            Map<String, Object> etc = getProblem(method, null);
+            String message = (String) etc
                     .get(OAuthProblemException.OAUTH_PROBLEM);
-            if (message == null) {
-                message = "HTTP status " + statusCode + " " + statusText;
-            }
             OAuthProblemException problem = new OAuthProblemException(message);
-            problem.getParameters().putAll(parameters);
-            problem.setParameter("URL", method.getURI().toString());
-            problem.setParameter(OAuthProblemException.HTTP_STATUS_CODE,
-                    new Integer(statusCode));
-            problem.setParameter(OAuthProblemException.HTTP_STATUS_TEXT,
-                    statusText);
-            if (statusCode == HttpStatus.SC_MOVED_TEMPORARILY
-                    || statusCode == HttpStatus.SC_MOVED_PERMANENTLY) {
-                Header location = method.getResponseHeader("Location");
-                if (location != null) {
-                    problem.setParameter("Location", location.getValue());
-                }
-            }
+            problem.getParameters().putAll(etc);
             throw problem;
         }
+    }
+
+    public static Map<String, Object> getProblem(HttpMethod method,
+            String responseBody) throws IOException {
+        Map<String, Object> problem = new HashMap<String, Object>();
+        problem.put("URL", method.getURI().toString());
+        StringBuilder response = new StringBuilder(method.getStatusLine()
+                .toString());
+        response.append("\n");
+        for (Header header : method.getResponseHeaders()) {
+            response.append(header.getName()).append(": ").append(
+                    header.getValue()).append("\n");
+        }
+        if (responseBody == null) {
+            responseBody = method.getResponseBodyAsString();
+        }
+        if (responseBody != null) {
+            response.append("\n");
+            response.append(responseBody);
+        }
+        problem.put("HTTP response", response);
+        return problem;
     }
 
     /**

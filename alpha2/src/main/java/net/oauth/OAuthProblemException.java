@@ -30,8 +30,6 @@ public class OAuthProblemException extends Exception {
 
     public static final String HTTP_STATUS_CODE = "HTTP status";
 
-    public static final String HTTP_STATUS_TEXT = "HTTP status text";
-
     public OAuthProblemException() {
     }
 
@@ -57,7 +55,7 @@ public class OAuthProblemException extends Exception {
     public int getHttpStatusCode() {
         Object code = getParameters().get(HTTP_STATUS_CODE);
         if (code == null) {
-            return 0;
+            return 200;
         } else {
             return Integer.parseInt(code.toString());
         }
