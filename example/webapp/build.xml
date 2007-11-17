@@ -14,13 +14,13 @@
   <property name="compile.optimize"    value="true"/>
   <property name="compile.verbose"     value="false"/>
 
-  <fileset id="lib.jars" dir="..">
+  <fileset id="lib.jars" dir="../..">
     <include name="lib/*.jar"/>
     <include name="libext/*.jar"/>
   </fileset>
 
   <path id="compile.classpath">
-    <pathelement location="../alpha2/dist/oauth-${app.version}.jar"/>
+    <pathelement location="../../alpha2/dist/oauth-${app.version}.jar"/>
     <fileset refid="lib.jars"/>
   </path>
 
