@@ -19,7 +19,11 @@ package net.oauth.example.consumer.webapp;
 import java.net.URL;
 import org.apache.commons.httpclient.HttpClient;
 
-/** A source of Jakarta Commons HttpClient objects. */
+/**
+ * A source of Jakarta Commons HttpClient objects.
+ * 
+ * @author John Kristian
+ */
 public interface HttpClientPool {
 
     /** Get the appropriate HttpClient for sending a request to the given URL. */

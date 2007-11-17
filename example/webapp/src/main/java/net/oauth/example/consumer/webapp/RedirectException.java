@@ -16,8 +16,13 @@
 
 package net.oauth.example.consumer.webapp;
 
-/** Indicates that the current HTTP client should be redirected. */
+/**
+ * Indicates that the server should redirect the HTTP client.
+ * 
+ * @author John Kristian
+ */
 public class RedirectException extends Exception {
+
     public RedirectException(String targetURL) {
         super(targetURL);
     }

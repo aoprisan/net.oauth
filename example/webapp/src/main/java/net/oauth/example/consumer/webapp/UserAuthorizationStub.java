@@ -10,6 +10,8 @@ import net.oauth.OAuth;
 /**
  * A trivial implementation of user authorization. It neither authenticates nor
  * obtains permission; it merely redirects the user back to the Consumer.
+ * 
+ * @author John Kristian
  */
 public class UserAuthorizationStub extends HttpServlet {
 

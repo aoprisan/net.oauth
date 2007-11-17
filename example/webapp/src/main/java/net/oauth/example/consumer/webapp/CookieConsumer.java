@@ -49,6 +49,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
  * Utility methods for consumers that store tokens and secrets in cookies. Each
  * consumer has a name, and its credentials are stored in cookies named
  * [name].requestToken, [name].accessToken and [name].tokenSecret.
+ * 
+ * @author John Kristian
  */
 public class CookieConsumer {
 

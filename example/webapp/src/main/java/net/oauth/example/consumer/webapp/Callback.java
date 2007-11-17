@@ -31,7 +31,11 @@ import net.oauth.client.OAuthHttpClient;
 import net.oauth.server.OAuthServlet;
 import org.apache.commons.httpclient.HttpMethod;
 
-/** An OAuth callback handler. */
+/**
+ * An OAuth callback handler.
+ * 
+ * @author John Kristian
+ */
 public class Callback extends HttpServlet {
 
     public static final String PATH = "/OAuth/Callback";

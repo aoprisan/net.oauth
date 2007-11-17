@@ -28,7 +28,11 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 
-/** Utility methods for an OAuth client based on the Jakarta Commons HTTP client. */
+/**
+ * Utility methods for an OAuth client based on the Jakarta Commons HTTP client.
+ * 
+ * @author John Kristian
+ */
 public class OAuthHttpClient {
 
     /**

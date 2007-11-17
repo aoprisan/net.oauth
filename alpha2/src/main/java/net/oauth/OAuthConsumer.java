@@ -22,6 +22,8 @@ import java.util.Map;
 /**
  * Properties of an OAuth Consumer. Properties may be added freely, e.g. to
  * support extensions.
+ * 
+ * @author John Kristian
  */
 public class OAuthConsumer {
 
@@ -51,7 +53,10 @@ public class OAuthConsumer {
         properties.put(name, value);
     }
 
-    /** The name of the property whose value is the accessor secret. */
-    public static final String ACCESSOR_SECRET = "accessorSecret";
+    /**
+     * The name of the property whose value is the <a
+     * href="http://oauth.pbwiki.com/AccessorSecret">Accessor Secret</a>.
+     */
+    public static final String ACCESSOR_SECRET = "oauth_accessor_secret";
 
 }

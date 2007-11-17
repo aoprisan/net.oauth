@@ -16,7 +16,11 @@
 
 package net.oauth;
 
-/** Properties of an OAuth Service Provider. */
+/**
+ * Properties of an OAuth Service Provider.
+ * 
+ * @author John Kristian
+ */
 public class OAuthServiceProvider {
 
     public final String requestTokenURL;

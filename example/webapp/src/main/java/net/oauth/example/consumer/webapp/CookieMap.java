@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Represents the set of cookies for the client of an HTTP request. Map-like
  * operations enable examining and modifying cookies.
+ * 
+ * @author John Kristian
  */
 public class CookieMap {
 

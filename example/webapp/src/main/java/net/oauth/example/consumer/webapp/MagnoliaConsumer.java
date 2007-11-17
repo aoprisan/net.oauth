@@ -27,7 +27,11 @@ import net.oauth.OAuth;
 import net.oauth.OAuthConsumer;
 import org.apache.commons.httpclient.HttpMethod;
 
-/** A trivial consumer of the 'tags' service at Ma.gnolia. */
+/**
+ * A trivial consumer of the 'tags' service at Ma.gnolia.
+ * 
+ * @author John Kristian
+ */
 public class MagnoliaConsumer extends HttpServlet {
 
     @Override

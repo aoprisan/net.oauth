@@ -23,6 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuthConsumer;
 
+/**
+ * @author John Kristian
+ */
 public class Reset extends HttpServlet {
 
     /** Clear all the OAuth cookies and redirect to another page. */

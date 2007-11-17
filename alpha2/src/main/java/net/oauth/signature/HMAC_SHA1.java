@@ -24,6 +24,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import net.oauth.OAuth;
 
+/**
+ * @author John Kristian
+ */
 class HMAC_SHA1 extends OAuthSignatureMethod {
 
     @Override

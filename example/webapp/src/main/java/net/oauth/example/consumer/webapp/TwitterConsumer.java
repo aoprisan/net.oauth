@@ -26,7 +26,11 @@ import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuthConsumer;
 import org.apache.commons.httpclient.HttpMethod;
 
-/** A trivial consumer of the 'friends_timeline' service at Twitter. */
+/**
+ * A trivial consumer of the 'friends_timeline' service at Twitter.
+ * 
+ * @author John Kristian
+ */
 public class TwitterConsumer extends HttpServlet {
 
     @Override

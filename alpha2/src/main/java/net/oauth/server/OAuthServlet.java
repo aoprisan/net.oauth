@@ -29,6 +29,11 @@ import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 
+/**
+ * Utility methods for servlets that implement OAuth.
+ * 
+ * @author John Kristian
+ */
 public class OAuthServlet {
 
     /**

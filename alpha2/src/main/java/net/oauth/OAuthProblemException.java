@@ -23,6 +23,8 @@ import java.util.Map;
  * Describes an OAuth-related problem, using a set of named parameters. One
  * parameter identifies the basic problem, and the others provide supplementary
  * diagnostic information.
+ * 
+ * @author John Kristian
  */
 public class OAuthProblemException extends Exception {
 

@@ -26,6 +26,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.oauth.signature.OAuthSignatureMethod;
 
+/**
+ * @author John Kristian
+ */
 public class OAuthMessage {
 
     public OAuthMessage(String httpMethod, String URL,

@@ -18,6 +18,9 @@ package net.oauth.signature;
 
 import net.oauth.OAuth;
 
+/**
+ * @author John Kristian
+ */
 class PLAINTEXT extends OAuthSignatureMethod {
 
     @Override

@@ -29,7 +29,11 @@ import net.oauth.OAuthMessage;
 import net.oauth.server.OAuthServlet;
 import org.apache.commons.httpclient.HttpMethod;
 
-/** A trivial consumer of the 'echo' service at term.ie. */
+/**
+ * A trivial consumer of the 'echo' service at term.ie.
+ * 
+ * @author John Kristian
+ */
 public class TermieConsumer extends HttpServlet {
 
     private static final String NAME = "term.ie";
