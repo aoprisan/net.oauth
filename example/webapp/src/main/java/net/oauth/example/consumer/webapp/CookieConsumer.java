@@ -108,6 +108,13 @@ public class CookieConsumer {
                 , p.getProperty(name + ".consumerKey") //
                 , p.getProperty(name + ".consumerSecret"), serviceProvider);
         consumer.setProperty("name", name);
+        for (Map.Entry prop : p.entrySet()) {
+            String propName = (String) prop.getKey();
+            if (propName.startsWith(name + ".consumer.")) {
+                String c = propName.substring(name.length() + 10);
+                consumer.setProperty(c, prop.getValue());
+            }
+        }
         return consumer;
     }
 
@@ -212,7 +219,11 @@ public class CookieConsumer {
         }
         String signatureMethod = pMap.get("oauth_signature_method");
         if (signatureMethod == null) {
-            signatureMethod = SIGNATURE_METHOD;
+            signatureMethod = (String) consumer
+                    .getProperty("oauth_signature_method");
+            if (signatureMethod == null) {
+                signatureMethod = SIGNATURE_METHOD;
+            }
             parms.add(new OAuth.Parameter("oauth_signature_method",
                     signatureMethod));
         }
