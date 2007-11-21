@@ -20,7 +20,7 @@
   </fileset>
 
   <path id="compile.classpath">
-    <pathelement location="../../alpha2/dist/oauth-${app.version}.jar"/>
+    <pathelement location="../../core/dist/oauth-${app.version}.jar"/>
     <fileset refid="lib.jars"/>
   </path>
 
