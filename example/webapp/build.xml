@@ -16,7 +16,6 @@
 
   <fileset id="lib.jars" dir="../..">
     <include name="lib/*.jar"/>
-    <include name="libext/*.jar"/>
   </fileset>
 
   <path id="compile.classpath">
