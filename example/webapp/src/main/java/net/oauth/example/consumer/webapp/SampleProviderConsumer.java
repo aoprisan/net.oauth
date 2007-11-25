@@ -70,7 +70,7 @@ public class SampleProviderConsumer extends HttpServlet {
     private String invoke(OAuthAccessor accessor, OAuthMessage message)
             throws Exception {
         OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
-                "http://sns.office.aol.com:8080/OAuthProvider/echo", message
+                "http://localhost:8084/OAuthProvider/echo", message
                         .getParameters());
         String responseBody = result.getBodyAsString();
         return responseBody;
