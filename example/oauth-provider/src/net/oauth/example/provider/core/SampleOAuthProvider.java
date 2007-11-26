@@ -245,36 +245,4 @@ public class SampleOAuthProvider {
         OAuthServlet.handleException(response, e, realm); 
     }
 
-    /** Return the HTML representation of the given plain text. */
-    public static String htmlEncode(Object o) {
-        if (o == null) {
-            return null;
-        }
-        String s = o.toString();
-        int len = s.length();
-        // start with a big enough buffer, avoid reallocations
-        StringBuilder sb = new StringBuilder(2 * len);
-        for (int i = 0; i < len; i++) {
-            char c = s.charAt(i);
-            switch (c) {
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
-                break;
-            }
-        }
-        return sb.toString();
-    }
-
 }
