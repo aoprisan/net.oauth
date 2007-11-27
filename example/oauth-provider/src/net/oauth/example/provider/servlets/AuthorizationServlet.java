@@ -91,6 +91,9 @@ public class AuthorizationServlet extends HttpServlet {
             HttpServletResponse response, OAuthAccessor accessor)
     throws IOException, ServletException{
         String callback = request.getParameter("oauth_callback");
+        if(callback == null || callback.length() <=0) {
+            callback = "none";
+        }
         String consumer_description = (String)accessor.consumer.getProperty("description");
         request.setAttribute("CONS_DESC", consumer_description);
         request.setAttribute("CALLBACK", callback);
@@ -106,14 +109,33 @@ public class AuthorizationServlet extends HttpServlet {
     throws IOException, ServletException{
         // send the user back to site's callBackUrl
         String callback = request.getParameter("oauth_callback");
-        // if callback is not passed in, use the callback from config
-        if(callback == null || callback.length() <=0 )
+        if("none".equals(callback) 
+            && accessor.consumer.callbackURL != null 
+                && accessor.consumer.callbackURL.length() > 0){
+            // first check if we have something in our properties file
             callback = accessor.consumer.callbackURL;
-        String token = accessor.requestToken;
-        if (token != null) {
-            callback = OAuth.addParameters(callback, "oauth_token", token);
         }
-        response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-        response.setHeader("Location", callback);
+        
+        if( "none".equals(callback) ) {
+            // no call back it must be a client
+            response.setContentType("text/plain");
+            PrintWriter out = response.getWriter();
+            out.println("You have successfully authorized '" 
+                    + accessor.consumer.getProperty("description") 
+                    + "'. Please close this browser window and click continue"
+                    + " in the client.");
+            out.close();
+        } else {
+            // if callback is not passed in, use the callback from config
+            if(callback == null || callback.length() <=0 )
+                callback = accessor.consumer.callbackURL;
+            String token = accessor.requestToken;
+            if (token != null) {
+                callback = OAuth.addParameters(callback, "oauth_token", token);
+            }
+
+            response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+            response.setHeader("Location", callback);
+        }
     }
 }
