@@ -42,7 +42,16 @@ public class AccessTokenServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+        processRequest(request, response);
+    }
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+        processRequest(request, response);
+    }
         
+    public void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
         try{
             OAuthMessage requestMessage = OAuthServlet.getMessage(request, null);
             
