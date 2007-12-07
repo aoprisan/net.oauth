@@ -17,12 +17,13 @@
 package net.oauth.example.provider.servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
@@ -83,12 +84,11 @@ public class RequestTokenServlet extends HttpServlet {
             SampleOAuthProvider.generateRequestToken(accessor);
             
             response.setContentType("text/plain");
-            PrintWriter out = response.getWriter();
-
-            out.println("oauth_token=" + accessor.requestToken 
-                        + "&oauth_token_secret=" + accessor.tokenSecret + "&");
+            OutputStream out = response.getOutputStream();
+            OAuth.formEncode(OAuth.newList("oauth_token", accessor.requestToken,
+                                           "oauth_token_secret", accessor.tokenSecret),
+                             out);
             out.close();
-            
             
         } catch (Exception e){
             SampleOAuthProvider.handleException(e, request, response);
