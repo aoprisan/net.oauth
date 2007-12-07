@@ -71,7 +71,14 @@ public class RequestTokenServlet extends HttpServlet {
             
             // verify the signature
             requestMessage.validateSignature(accessor);
-            
+            {
+                // Support the 'Variable Accessor Secret' extension
+                // described in http://oauth.pbwiki.com/AccessorSecret
+                String secret = requestMessage.getParameter("oauth_accessor_secret");
+                if (secret != null) {
+                    accessor.setProperty(OAuthConsumer.ACCESSOR_SECRET, secret);
+                }
+            }
             // generate request_token and secret
             SampleOAuthProvider.generateRequestToken(accessor);
             
