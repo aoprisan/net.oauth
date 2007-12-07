@@ -16,14 +16,16 @@
 
 package net.oauth.example.provider.servlets;
 
-import java.io.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthMessage;
-import net.oauth.OAuthProblemException;
 import net.oauth.example.provider.core.SampleOAuthProvider;
 import net.oauth.server.OAuthServlet;
 
@@ -49,7 +51,7 @@ public class AuthorizationServlet extends HttpServlet {
             
             OAuthAccessor accessor = SampleOAuthProvider.getAccessor(requestMessage);
            
-            if(accessor.isAuthorized()){
+            if (Boolean.TRUE.equals(accessor.getProperty("authorized"))) {
                 // already authorized send the user back
                 returnToConsumer(request, response, accessor);
             } else {
@@ -138,4 +140,7 @@ public class AuthorizationServlet extends HttpServlet {
             response.setHeader("Location", callback);
         }
     }
+
+    private static final long serialVersionUID = 1L;
+
 }

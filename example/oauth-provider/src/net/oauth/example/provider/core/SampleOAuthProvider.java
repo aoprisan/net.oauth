@@ -18,7 +18,6 @@ package net.oauth.example.provider.core;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -162,8 +161,8 @@ public class SampleOAuthProvider {
         // first remove the accessor from cache
         ALL_TOKENS.remove(accessor);
         
-        accessor.user = userId;   
-        accessor.authorized = true;
+        accessor.setProperty("user", userId);   
+        accessor.setProperty("authorized", Boolean.TRUE);
         
         // update token in local cache
         ALL_TOKENS.add(accessor);
@@ -222,19 +221,6 @@ public class SampleOAuthProvider {
         
         // update token in local cache
         ALL_TOKENS.add(accessor);
-    }
-
-    /** Reconstruct the requested URL path, complete with query string (if any). */
-    private static String getRequestPath(HttpServletRequest request)
-            throws MalformedURLException {
-
-        URL url = new URL(OAuthServlet.getRequestURL(request));
-        StringBuilder path = new StringBuilder(url.getPath());
-        String queryString = url.getQuery();
-        if (queryString != null) {
-            path.append("?").append(queryString);
-        }
-        return path.toString();
     }
 
     public static void handleException(Exception e, HttpServletRequest request,

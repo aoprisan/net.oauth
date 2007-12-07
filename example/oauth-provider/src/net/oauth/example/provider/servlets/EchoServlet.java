@@ -16,10 +16,12 @@
 
 package net.oauth.example.provider.servlets;
 
-import java.io.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthMessage;
 import net.oauth.example.provider.core.SampleOAuthProvider;
@@ -43,7 +45,7 @@ public class EchoServlet extends HttpServlet {
             
             OAuthAccessor accessor = SampleOAuthProvider.getAccessor(requestMessage);
             
-            String userId = (String)accessor.user;
+            String userId = (String) accessor.getProperty("user");
             // verify the signature
             requestMessage.validateSignature(accessor);
             
@@ -58,4 +60,7 @@ public class EchoServlet extends HttpServlet {
         }
         
     }
+
+    private static final long serialVersionUID = 1L;
+
 }
