@@ -6,6 +6,12 @@ ma.gnolia.serviceProvider.accessTokenURL: http://ma.gnolia.com/oauth/get_access_
 ma.gnolia.consumerKey: - your key here -
 ma.gnolia.consumerSecret: - your secret here -
 
+sample.serviceProvider.requestTokenURL: http://localhost/oauth-provider/request_token
+sample.serviceProvider.userAuthorizationURL: http://localhost/oauth-provider/authorize
+sample.serviceProvider.accessTokenURL: http://localhost/oauth-provider/access_token
+sample.consumerKey: myKey
+sample.consumerSecret: mySecret
+
 term.ie.serviceProvider.requestTokenURL: http://term.ie/oauth/example/request_token.php
 term.ie.serviceProvider.userAuthorizationURL: /OAuth/UserAuthorizationStub
 term.ie.serviceProvider.accessTokenURL: http://term.ie/oauth/example/access_token.php
