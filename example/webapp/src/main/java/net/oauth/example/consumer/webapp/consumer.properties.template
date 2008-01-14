@@ -1,0 +1,20 @@
+# Here are the configuration parameters for the consumers in this web application.
+
+ma.gnolia.serviceProvider.requestTokenURL: http://ma.gnolia.com/oauth/get_request_token
+ma.gnolia.serviceProvider.userAuthorizationURL: http://ma.gnolia.com/oauth/authorize
+ma.gnolia.serviceProvider.accessTokenURL: http://ma.gnolia.com/oauth/get_access_token
+ma.gnolia.consumerKey: - your key here -
+ma.gnolia.consumerSecret: - your secret here -
+
+term.ie.serviceProvider.requestTokenURL: http://term.ie/oauth/example/request_token.php
+term.ie.serviceProvider.userAuthorizationURL: /OAuth/UserAuthorizationStub
+term.ie.serviceProvider.accessTokenURL: http://term.ie/oauth/example/access_token.php
+term.ie.consumerKey: key
+term.ie.consumerSecret: secret
+
+twitter.serviceProvider.requestTokenURL: http://twitter.com/oauth/request_token
+twitter.serviceProvider.userAuthorizationURL: http://twitter.com/oauth/authorize
+twitter.serviceProvider.accessTokenURL: http://twitter.com/oauth/access_token
+twitter.consumerKey: - your key here -
+twitter.consumerSecret: - your secret here -
+# twitter.consumer.oauth_signature_method: PLAINTEXT
