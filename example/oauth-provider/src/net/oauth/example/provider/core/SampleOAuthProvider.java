@@ -111,8 +111,7 @@ public class SampleOAuthProvider {
         consumer = SampleOAuthProvider.ALL_CONSUMERS.get(consumer_key);
         
         if(consumer == null) {
-            OAuthProblemException problem = new OAuthProblemException(
-                        "invalid_token");
+            OAuthProblemException problem = new OAuthProblemException("token_rejected");
             throw problem;
         }
         
@@ -143,8 +142,7 @@ public class SampleOAuthProvider {
         }
         
         if(accessor == null){
-            OAuthProblemException problem = new OAuthProblemException(
-                        "invalid_expired_token");
+            OAuthProblemException problem = new OAuthProblemException("token_expired");
             throw problem;
         }
         
