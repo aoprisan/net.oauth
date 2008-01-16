@@ -18,6 +18,7 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -60,9 +61,12 @@ public class SampleProviderConsumer extends HttpServlet {
 
     private String invoke(OAuthAccessor accessor, OAuthMessage message)
             throws Exception {
-        OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
-                "http://localhost/oauth-provider/echo", message
-                        .getParameters());
+        URL baseURL = (URL) accessor.consumer.getProperty("serviceProvider.baseURL");
+        if (baseURL == null) {
+            baseURL = new URL("http://localhost/oauth-provider/");
+        }
+        OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor, (new URL(
+                baseURL, "echo")).toExternalForm(), message.getParameters());
         String responseBody = result.getBodyAsString();
         return responseBody;
     }
