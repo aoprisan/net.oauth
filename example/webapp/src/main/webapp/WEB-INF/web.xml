@@ -20,6 +20,10 @@
         <servlet-class>net.oauth.example.consumer.webapp.MagnoliaConsumer</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>MediamaticConsumer</servlet-name>
+        <servlet-class>net.oauth.example.consumer.webapp.MediamaticConsumer</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>Reset</servlet-name>
         <servlet-class>net.oauth.example.consumer.webapp.Reset</servlet-class>
     </servlet>
@@ -46,6 +50,10 @@
     <servlet-mapping>
         <servlet-name>MagnoliaConsumer</servlet-name>
         <url-pattern>/Magnolia</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MediamaticConsumer</servlet-name>
+        <url-pattern>/Mediamatic</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Callback</servlet-name>

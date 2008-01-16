@@ -8,6 +8,13 @@ ma.gnolia.serviceProvider.accessTokenURL: oauth/get_access_token
 ma.gnolia.consumerKey: - your key here -
 ma.gnolia.consumerSecret: - your secret here -
 
+mediamatic.serviceProvider.baseURL: http://oauth-sandbox.mediamatic.nl/module/
+mediamatic.serviceProvider.requestTokenURL: OAuth/request_token
+mediamatic.serviceProvider.userAuthorizationURL: OAuth/authorize
+mediamatic.serviceProvider.accessTokenURL: OAuth/access_token
+mediamatic.consumerKey: e388e4f4d6f4cc10ff6dc0fd1637da370478e49e2
+mediamatic.consumerSecret: 0b062293b6e29ec91a23b2002abf88e9
+
 sample.serviceProvider.baseURL: http://localhost/oauth-provider/
 sample.serviceProvider.requestTokenURL: request_token
 sample.serviceProvider.userAuthorizationURL: authorize
