@@ -63,7 +63,8 @@ public class MediamaticConsumer extends HttpServlet {
     private String invoke(OAuthAccessor accessor, OAuthMessage message)
             throws Exception {
         URL serviceURL = (new URL((URL) accessor.consumer
-                .getProperty("serviceProvider.baseURL"), "OAuth/menu"));
+                .getProperty("serviceProvider.baseURL"),
+                "services/rest/?method=anymeta.test.echo"));
         OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor, serviceURL
                 .toExternalForm(), message.getParameters());
         String responseBody = result.getBodyAsString();
