@@ -1,7 +1,8 @@
 <project name="CookieJar" default="compile" basedir=".">
   <property name="app.name"   value="CookieJar"/>
+  <property name="web.home"   value="${basedir}/src/main/webapp"/>
   <property file="../../build.properties"/>
-  <property name="build.home" value="${basedir}/src/main/webapp"/>
+  <property name="build.home"    value="${basedir}/build"/>
 
   <fileset id="lib.jars" dir="../..">
     <include name="lib/*.jar"/>
@@ -18,7 +19,7 @@
 
   <target name="clean"
           description="Delete old build and dist directories">
-    <delete dir="${build.home}/WEB-INF/classes"/>
+    <delete dir="${build.home}"/>
     <delete dir="${dist.home}"/>
   </target>
 
@@ -43,6 +44,12 @@
   <target name="war"
           depends="compile"
           description="Create .war file">
+    <!-- Copy static content (jsp/images/js/etc..) of this web application -->
+    <copy todir="${build.home}">
+        <fileset dir="${web.home}">
+            <exclude name="**/.*"/>
+        </fileset>
+    </copy>
     <mkdir dir="${dist.home}"/>
     <war destfile="${dist.home}/${app.name}.war"
          basedir="${build.home}"
