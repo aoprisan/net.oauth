@@ -19,6 +19,8 @@ package net.oauth.example.consumer.webapp;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +33,7 @@ import net.oauth.server.OAuthServlet;
 
 /**
  * Consumer for Sample OAuth Provider
+ * 
  * @author Praveen Alavilli
  */
 public class SampleProviderConsumer extends HttpServlet {
@@ -44,30 +47,34 @@ public class SampleProviderConsumer extends HttpServlet {
             consumer = CookieConsumer.getConsumer(NAME, getServletContext());
             OAuthAccessor accessor = CookieConsumer.getAccessor(request,
                     response, consumer);
-            OAuthMessage message = OAuthServlet.getMessage(request, null);
-            message.addParameter(new OAuth.Parameter("oauth_token",
-                    accessor.accessToken));
-            message.addParameter(new OAuth.Parameter("echo", "What's my UserId?"));
+            Collection<OAuth.Parameter> parameters = OAuthServlet
+                    .getParameters(request);
+            if (!OAuth.newMap(parameters).containsKey("echo")) {
+                parameters.add(new OAuth.Parameter("echo", "Hello."));
+            }
             response.setContentType("text/plain");
             PrintWriter out = response.getWriter();
             out.println("Sample Provider said:");
             // Try it twice:
-            out.println(invoke(accessor, message));
-            out.println(invoke(accessor, message));
+            out.println(invoke(accessor, parameters));
+            out.println(invoke(accessor, parameters));
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
         }
     }
 
-    private String invoke(OAuthAccessor accessor, OAuthMessage message)
-            throws Exception {
-        URL baseURL = (URL) accessor.consumer.getProperty("serviceProvider.baseURL");
+    private String invoke(OAuthAccessor accessor,
+            Collection<? extends Map.Entry> parameters) throws Exception {
+        URL baseURL = (URL) accessor.consumer
+                .getProperty("serviceProvider.baseURL");
         if (baseURL == null) {
             baseURL = new URL("http://localhost/oauth-provider/");
         }
-        OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor, (new URL(
-                baseURL, "echo")).toExternalForm(), message.getParameters());
-        String responseBody = result.getBodyAsString();
+        OAuthMessage request = new OAuthMessage("POST", (new URL(baseURL,
+                "echo")).toExternalForm(), parameters);
+        request.addRequiredParameters(accessor);
+        OAuthMessage response = CookieConsumer.CLIENT.invoke(request);
+        String responseBody = response.getBodyAsString();
         return responseBody;
     }
 
