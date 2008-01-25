@@ -70,9 +70,8 @@ public class SampleProviderConsumer extends HttpServlet {
         if (baseURL == null) {
             baseURL = new URL("http://localhost/oauth-provider/");
         }
-        OAuthMessage request = new OAuthMessage("POST", (new URL(baseURL,
-                "echo")).toExternalForm(), parameters);
-        request.addRequiredParameters(accessor);
+        OAuthMessage request = accessor.newRequestMessage("POST", (new URL(
+                baseURL, "echo")).toExternalForm(), parameters);
         OAuthMessage response = CookieConsumer.CLIENT.invoke(request);
         String responseBody = response.getBodyAsString();
         return responseBody;
