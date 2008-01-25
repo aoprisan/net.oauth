@@ -18,6 +18,7 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,25 +46,22 @@ public class TermieConsumer extends HttpServlet {
             consumer = CookieConsumer.getConsumer(NAME, getServletContext());
             OAuthAccessor accessor = CookieConsumer.getAccessor(request,
                     response, consumer);
-            OAuthMessage message = OAuthServlet.getMessage(request, null);
-            message.addParameter(new OAuth.Parameter("oauth_token",
-                    accessor.accessToken));
+            List<OAuth.Parameter> parameters = OAuthServlet.getParameters(request);
             response.setContentType("text/plain");
             PrintWriter out = response.getWriter();
-            out.println("term.ie said:");
+            out.println(NAME + " said:");
             // Try it twice:
-            out.println(invoke(accessor, message));
-            out.println(invoke(accessor, message));
+            out.println(echo(accessor, parameters));
+            out.println(echo(accessor, parameters));
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
         }
     }
 
-    private String invoke(OAuthAccessor accessor, OAuthMessage message)
+    private static String echo(OAuthAccessor accessor, List<OAuth.Parameter> parameters)
             throws Exception {
         OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
-                "http://term.ie/oauth/example/echo_api.php", message
-                        .getParameters());
+                "http://term.ie/oauth/example/echo_api.php", parameters);
         String responseBody = result.getBodyAsString();
         return responseBody;
     }
