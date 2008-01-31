@@ -7,7 +7,7 @@
   <url>http://oauth.net/code/</url>
 
   <properties>
-        <oauthVersion>20080130</oauthVersion>
+        <oauthVersion>20080131</oauthVersion>
   </properties>
 
   <!-- override these ones -->
