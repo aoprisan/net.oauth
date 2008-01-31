@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <packaging>pom</packaging> 
+  <packaging>pom</packaging>
   <url>http://oauth.net/code/</url>
 
+  <properties>
+        <oauthVersion>20080130</oauthVersion>
+  </properties>
+
   <!-- override these ones -->
-  <version>1.1</version>
+  <version>${oauthVersion}</version>
   <groupId>net.oauth</groupId>
   <artifactId>oauth-parent</artifactId>
   <name>OAuth::Parent POM</name>
@@ -55,7 +59,7 @@
   </build>
   <scm>
     <connection>scm:svn:http://oauth.googlecode.com/svn/code/java/</connection>
-    <developerConnection/>
+    <developerConnection>scm:svn:https://oauth.googlecode.com/svn/code/java/</developerConnection>
     <url>http://oauth.googlecode.com/svn/code/java/</url>
   </scm>
   <dependencies>
@@ -76,9 +80,10 @@
   </reporting>
   <distributionManagement>
     <repository>
-      <id>oauth-repo</id>
+      <id>oauth</id>
       <name>Local OAuth Repository</name>
-      <url>file:./maven</url>
+      <url>file:../maven</url>
+      <uniqueVersion>true</uniqueVersion>
     </repository>
   </distributionManagement>
 </project>
