@@ -18,6 +18,7 @@ package net.oauth.example.provider.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import net.oauth.server.OAuthServlet;
  * A text servlet to echo incoming "echo" param along with userId
  *
  * @author Praveen Alavilli
+ * @author John Kristian
  */
 public class EchoServlet extends HttpServlet {
     
@@ -44,28 +46,27 @@ public class EchoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        
-        String param = request.getParameter("echo");
-        
         try{
             OAuthMessage requestMessage = OAuthServlet.getMessage(request, null);
-            
             OAuthAccessor accessor = SampleOAuthProvider.getAccessor(requestMessage);
-            
-            String userId = (String) accessor.getProperty("user");
-            // verify the signature
             requestMessage.validateSignature(accessor);
+            String userId = (String) accessor.getProperty("user");
             
             response.setContentType("text/plain");
             PrintWriter out = response.getWriter();
-            // Try it twice:
-            out.println(param + " [Your UserId:" + userId + "]");
+            out.println("[Your UserId:" + userId + "]");
+            for (Object item : request.getParameterMap().entrySet()) {
+                Map.Entry parameter = (Map.Entry) item;
+                String[] values = (String[]) parameter.getValue();
+                for (String value : values) {
+                    out.println(parameter.getKey() + ": " + value);
+                }
+            }
             out.close();
             
         } catch (Exception e){
             SampleOAuthProvider.handleException(e, request, response);
         }
-        
     }
 
     private static final long serialVersionUID = 1L;
