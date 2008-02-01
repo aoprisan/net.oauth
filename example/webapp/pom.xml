@@ -4,7 +4,7 @@
   <parent>
      <groupId>net.oauth</groupId>
      <artifactId>oauth-parent</artifactId>
-     <version>${oauthVersion}</version>
+     <version>20080131</version>
   </parent>
   <groupId>net.oauth.example</groupId>
   <artifactId>consumer</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>net.oauth</groupId>
       <artifactId>core</artifactId>
-      <version>${oauthVersion}</version>
+      <version>20080131</version>
     </dependency>
   </dependencies>
   <!--dependencies>

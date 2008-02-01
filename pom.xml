@@ -6,12 +6,8 @@
   <packaging>pom</packaging>
   <url>http://oauth.net/code/</url>
 
-  <properties>
-        <oauthVersion>20080131</oauthVersion>
-  </properties>
-
   <!-- override these ones -->
-  <version>${oauthVersion}</version>
+  <version>20080131</version>
   <groupId>net.oauth</groupId>
   <artifactId>oauth-parent</artifactId>
   <name>OAuth::Parent POM</name>
