@@ -80,7 +80,7 @@ public class AccessTokenServlet extends HttpServlet {
             out.close();
             
         } catch (Exception e){
-            SampleOAuthProvider.handleException(e, request, response);
+            SampleOAuthProvider.handleException(e, request, response, true);
         }
     }
 

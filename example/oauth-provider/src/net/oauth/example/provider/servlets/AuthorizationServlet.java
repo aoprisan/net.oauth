@@ -59,7 +59,7 @@ public class AuthorizationServlet extends HttpServlet {
             }
         
         } catch (Exception e){
-            SampleOAuthProvider.handleException(e, request, response);
+            SampleOAuthProvider.handleException(e, request, response, true);
         }
         
         
@@ -85,7 +85,7 @@ public class AuthorizationServlet extends HttpServlet {
             returnToConsumer(request, response, accessor);
             
         } catch (Exception e){
-            SampleOAuthProvider.handleException(e, request, response);
+            SampleOAuthProvider.handleException(e, request, response, true);
         }
     }
     

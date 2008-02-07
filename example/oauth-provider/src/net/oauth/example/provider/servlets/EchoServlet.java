@@ -65,7 +65,7 @@ public class EchoServlet extends HttpServlet {
             out.close();
             
         } catch (Exception e){
-            SampleOAuthProvider.handleException(e, request, response);
+            SampleOAuthProvider.handleException(e, request, response, false);
         }
     }
 

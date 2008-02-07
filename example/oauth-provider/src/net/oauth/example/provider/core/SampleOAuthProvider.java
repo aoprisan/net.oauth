@@ -222,11 +222,11 @@ public class SampleOAuthProvider {
     }
 
     public static void handleException(Exception e, HttpServletRequest request,
-            HttpServletResponse response)
+            HttpServletResponse response, boolean sendBody)
             throws IOException, ServletException {
         String realm = (request.isSecure())?"https://":"http://";
         realm += request.getLocalName();
-        OAuthServlet.handleException(response, e, realm); 
+        OAuthServlet.handleException(response, e, realm, sendBody); 
     }
 
 }
