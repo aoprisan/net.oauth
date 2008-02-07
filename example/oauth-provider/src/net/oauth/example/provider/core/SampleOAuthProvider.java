@@ -102,7 +102,7 @@ public class SampleOAuthProvider {
 
     public static synchronized OAuthConsumer getConsumer(
             OAuthMessage requestMessage)
-            throws OAuthProblemException {
+            throws IOException, OAuthProblemException {
         
         OAuthConsumer consumer = null;
         // try to load from local cache if not throw exception
@@ -122,7 +122,7 @@ public class SampleOAuthProvider {
      * Get the access token and token secret for the given oauth_token. 
      */
     public static synchronized OAuthAccessor getAccessor(OAuthMessage requestMessage)
-            throws OAuthProblemException {
+            throws IOException, OAuthProblemException {
         
         // try to load from local cache if not throw exception
         String consumer_token = requestMessage.getToken();
