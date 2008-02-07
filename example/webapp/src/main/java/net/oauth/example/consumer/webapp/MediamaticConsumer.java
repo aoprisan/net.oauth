@@ -17,10 +17,12 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,25 +52,34 @@ public class MediamaticConsumer extends HttpServlet {
             List<OAuth.Parameter> parameters = OAuthServlet
                     .getParameters(request);
             response.setContentType("text/plain");
-            PrintWriter out = response.getWriter();
-            out.println(NAME + " said:");
             // Try it twice:
-            out.println(echo(accessor, parameters));
-            out.println(echo(accessor, parameters));
+            echo(accessor, parameters, response);
+            echo(accessor, parameters, response);
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
         }
     }
 
-    private static String echo(OAuthAccessor accessor,
-            List<OAuth.Parameter> parameters) throws Exception {
+    private static void echo(OAuthAccessor accessor,
+            List<OAuth.Parameter> parameters, ServletResponse result)
+            throws Exception {
         URL serviceURL = (new URL((URL) accessor.consumer
                 .getProperty("serviceProvider.baseURL"),
                 "services/rest/?method=anymeta.test.echo"));
         OAuthMessage response = CookieConsumer.CLIENT.invoke(accessor,
                 serviceURL.toExternalForm(), parameters);
-        String responseBody = response.getBodyAsString();
-        return responseBody;
+        OutputStream out = result.getOutputStream();
+        InputStream in = response.getBodyAsStream();
+        try {
+            byte[] buffer = new byte[32];
+            int len = 0;
+            while (0 < (len = in.read(buffer, 0, buffer.length))) {
+                out.write(buffer, 0, len);
+            }
+            out.write('\n');
+        } finally {
+            in.close();
+        }
     }
 
     private static final long serialVersionUID = 1L;
