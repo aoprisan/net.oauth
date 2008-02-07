@@ -55,7 +55,7 @@
     <war destfile="${dist.home}/${app.name}.war"
          basedir="${build.home}"
          webxml="${build.home}/WEB-INF/web.xml">
-      <lib dir="../../lib" excludes="servlet-api.jar" />
+      <lib dir="../../lib" excludes="servlet-api*.jar" />
       <lib file="../../core/dist/oauth-${app.version}.jar"/>
     </war>
   </target>
