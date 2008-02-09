@@ -22,7 +22,6 @@
   <build>
      <sourceDirectory>src</sourceDirectory>
      <testSourceDirectory>test</testSourceDirectory>
-     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -38,7 +37,7 @@
             <scanIntervalSeconds>10</scanIntervalSeconds>
             <webAppSourceDirectory>${basedir}/web</webAppSourceDirectory>
             <webXmlFile>${basedir}/web/WEB-INF/web.xml</webXmlFile>
-            <contextPath>/provider</contextPath>
+            <contextPath>/oauth-provider</contextPath>
             <connectors>
               <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                 <port>9090</port>
@@ -54,6 +53,13 @@
           </configuration>
         </plugin>
       </plugins>
-    </pluginManagement>
+      <resources>
+        <resource>
+          <directory>src</directory>
+          <includes>
+            <include>**/*.properties</include>
+          </includes>
+        </resource>
+      </resources>
   </build>
 </project>

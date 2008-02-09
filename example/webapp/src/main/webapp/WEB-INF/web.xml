@@ -8,10 +8,6 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
     <servlet>
-        <servlet-name>AccountConsumer</servlet-name>
-        <servlet-class>com.harlequin.agent.AccountConsumer</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>Callback</servlet-name>
         <servlet-class>net.oauth.example.consumer.webapp.Callback</servlet-class>
     </servlet>
@@ -43,10 +39,6 @@
         <servlet-name>SampleProviderConsumer</servlet-name>
         <servlet-class>net.oauth.example.consumer.webapp.SampleProviderConsumer</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>AccountConsumer</servlet-name>
-        <url-pattern>/Account</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MagnoliaConsumer</servlet-name>
         <url-pattern>/Magnolia</url-pattern>

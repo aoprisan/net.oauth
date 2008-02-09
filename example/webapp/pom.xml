@@ -18,16 +18,7 @@
       <version>20080131</version>
     </dependency>
   </dependencies>
-  <!--dependencies>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-    </dependency>
-  </dependencies-->
-
   <build>
-     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.mortbay.jetty</groupId>
@@ -36,7 +27,7 @@
             <scanIntervalSeconds>10</scanIntervalSeconds>
             <webAppSourceDirectory>${basedir}/src/main/webapp/</webAppSourceDirectory>
             <webXmlFile>${basedir}/src/main/webapp/WEB-INF/web.xml</webXmlFile>
-            <contextPath>/oauth-provider</contextPath>
+            <contextPath>/CookieJar</contextPath>
             <connectors>
               <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                 <port>9091</port>
@@ -52,6 +43,13 @@
           </configuration>
         </plugin>
       </plugins>
-    </pluginManagement>
+      <resources>
+         <resource>
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.properties</include>
+          </includes>
+         </resource>
+      </resources>
   </build>
 </project>
