@@ -7,7 +7,7 @@
   <url>http://oauth.net/code/</url>
 
   <!-- override these ones -->
-  <version>20080131</version>
+  <version>20080229</version>
   <groupId>net.oauth</groupId>
   <artifactId>oauth-parent</artifactId>
   <name>OAuth::Parent POM</name>
