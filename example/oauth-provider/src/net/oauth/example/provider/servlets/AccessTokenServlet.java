@@ -60,9 +60,7 @@ public class AccessTokenServlet extends HttpServlet {
             OAuthMessage requestMessage = OAuthServlet.getMessage(request, null);
             
             OAuthAccessor accessor = SampleOAuthProvider.getAccessor(requestMessage);
-            
-            // verify the signature
-            requestMessage.validateSignature(accessor);
+            SampleOAuthProvider.VALIDATOR.validateMessage(requestMessage, accessor);
             
             // make sure token is authorized
             if (!Boolean.TRUE.equals(accessor.getProperty("authorized"))) {

@@ -33,6 +33,8 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.OAuthValidator;
+import net.oauth.SimpleOAuthValidator;
 import net.oauth.server.OAuthServlet;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -45,8 +47,8 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class SampleOAuthProvider {
 
-    //public static final Collection<OAuthConsumer> ALL_CONSUMERS = new HashSet<OAuthConsumer>();
-    
+    public static final OAuthValidator VALIDATOR = new SimpleOAuthValidator();
+
     private static final Map<String, OAuthConsumer> ALL_CONSUMERS 
                     = Collections.synchronizedMap(new HashMap<String,OAuthConsumer>(10));
     

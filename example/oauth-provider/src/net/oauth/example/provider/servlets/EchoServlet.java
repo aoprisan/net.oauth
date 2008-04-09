@@ -49,7 +49,7 @@ public class EchoServlet extends HttpServlet {
         try{
             OAuthMessage requestMessage = OAuthServlet.getMessage(request, null);
             OAuthAccessor accessor = SampleOAuthProvider.getAccessor(requestMessage);
-            requestMessage.validateSignature(accessor);
+            SampleOAuthProvider.VALIDATOR.validateMessage(requestMessage, accessor);
             String userId = (String) accessor.getProperty("user");
             
             response.setContentType("text/plain");
