@@ -19,10 +19,12 @@ package net.oauth.example.provider.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthMessage;
 import net.oauth.example.provider.core.SampleOAuthProvider;

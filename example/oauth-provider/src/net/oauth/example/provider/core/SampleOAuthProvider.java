@@ -25,18 +25,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.codec.digest.DigestUtils;
+
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
+import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.OAuthValidator;
 import net.oauth.SimpleOAuthValidator;
 import net.oauth.server.OAuthServlet;
-import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * Utility methods for providers that store consumers, tokens and secrets in 
@@ -155,7 +159,7 @@ public class SampleOAuthProvider {
      * Set the access token 
      */
     public static synchronized void markAsAuthorized(OAuthAccessor accessor, String userId)
-            throws Exception {
+            throws OAuthException {
         
         
         // first remove the accessor from cache
@@ -172,11 +176,11 @@ public class SampleOAuthProvider {
     /**
      * Generate a fresh request token and secret for a consumer.
      * 
-     * @throws Exception
+     * @throws OAuthException
      */
     public static synchronized void generateRequestToken(
             OAuthAccessor accessor)
-            throws Exception {
+            throws OAuthException {
 
         // generate oauth_token and oauth_secret
         String consumer_key = (String) accessor.consumer.getProperty("name");
@@ -201,10 +205,10 @@ public class SampleOAuthProvider {
     /**
      * Generate a fresh request token and secret for a consumer.
      * 
-     * @throws Exception
+     * @throws OAuthException
      */
     public static synchronized void generateAccessToken(OAuthAccessor accessor)
-            throws Exception {
+            throws OAuthException {
 
         // generate oauth_token and oauth_secret
         String consumer_key = (String) accessor.consumer.getProperty("name");

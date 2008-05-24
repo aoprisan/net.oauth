@@ -20,25 +20,30 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.oauth.ConsumerProperties;
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
+import net.oauth.OAuthException;
 import net.oauth.OAuthProblemException;
 import net.oauth.client.HttpClientPool;
 import net.oauth.client.OAuthClient;
 import net.oauth.client.OAuthHttpClient;
 import net.oauth.server.OAuthServlet;
+
 import org.apache.commons.httpclient.HttpClient;
 
 /**
@@ -101,10 +106,12 @@ public class CookieConsumer {
      * Get the access token and token secret for the given consumer. Get them
      * from cookies if possible; otherwise obtain them from the service
      * provider. In the latter case, throw RedirectException.
+     * @throws IOException 
+     * @throws URISyntaxException 
      */
     public static OAuthAccessor getAccessor(HttpServletRequest request,
             HttpServletResponse response, OAuthConsumer consumer)
-            throws Exception {
+            throws OAuthException, IOException, URISyntaxException {
         CookieMap cookies = new CookieMap(request, response);
         OAuthAccessor accessor = newAccessor(consumer, cookies);
         if (accessor.accessToken == null) {
@@ -118,7 +125,7 @@ public class CookieConsumer {
      * necessarily have any tokens.
      */
     static OAuthAccessor newAccessor(OAuthConsumer consumer, CookieMap cookies)
-            throws Exception {
+            throws OAuthException {
         OAuthAccessor accessor = new OAuthAccessor(consumer);
         String consumerName = (String) consumer.getProperty("name");
         accessor.requestToken = cookies.get(consumerName + ".requestToken");
@@ -140,12 +147,15 @@ public class CookieConsumer {
 
     /**
      * Get a fresh access token from the service provider.
+     * @throws IOException 
+     * @throws URISyntaxException 
      * 
      * @throws RedirectException
      *             to obtain authorization
      */
     private static void getAccessToken(HttpServletRequest request,
-            CookieMap cookies, OAuthAccessor accessor) throws Exception {
+            CookieMap cookies, OAuthAccessor accessor)
+    throws OAuthException, IOException, URISyntaxException {
         CLIENT.getRequestToken(accessor);
         String consumerName = (String) accessor.consumer.getProperty("name");
         cookies.put(consumerName + ".requestToken", accessor.requestToken);

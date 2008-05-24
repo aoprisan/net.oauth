@@ -18,16 +18,20 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
+import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.server.OAuthServlet;
 
@@ -64,7 +68,8 @@ public class SampleProviderConsumer extends HttpServlet {
     }
 
     private String invoke(OAuthAccessor accessor,
-            Collection<? extends Map.Entry> parameters) throws Exception {
+            Collection<? extends Map.Entry> parameters)
+    throws OAuthException, IOException, URISyntaxException {
         URL baseURL = (URL) accessor.consumer
                 .getProperty("serviceProvider.baseURL");
         if (baseURL == null) {

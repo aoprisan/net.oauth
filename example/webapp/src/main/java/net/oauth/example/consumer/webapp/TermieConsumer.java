@@ -18,14 +18,18 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
+import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.server.OAuthServlet;
 
@@ -59,7 +63,7 @@ public class TermieConsumer extends HttpServlet {
     }
 
     private static String echo(OAuthAccessor accessor, List<OAuth.Parameter> parameters)
-            throws Exception {
+            throws OAuthException, IOException, URISyntaxException {
         OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
                 "http://term.ie/oauth/example/echo_api.php", parameters);
         String responseBody = result.getBodyAsString();

@@ -16,12 +16,14 @@
 
 package net.oauth.example.consumer.webapp;
 
+import net.oauth.OAuthException;
+
 /**
  * Indicates that the server should redirect the HTTP client.
  * 
  * @author John Kristian
  */
-public class RedirectException extends Exception {
+public class RedirectException extends OAuthException {
 
     public RedirectException(String targetURL) {
         super(targetURL);

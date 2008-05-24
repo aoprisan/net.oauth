@@ -17,6 +17,7 @@
 package net.oauth.example.consumer.webapp;
 
 import java.net.URL;
+
 import org.apache.commons.httpclient.HttpClient;
 
 /**

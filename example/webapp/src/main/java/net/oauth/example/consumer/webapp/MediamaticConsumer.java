@@ -19,16 +19,20 @@ package net.oauth.example.consumer.webapp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
+import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.server.OAuthServlet;
 
@@ -62,7 +66,7 @@ public class MediamaticConsumer extends HttpServlet {
 
     private static void echo(OAuthAccessor accessor,
             List<OAuth.Parameter> parameters, ServletResponse result)
-            throws Exception {
+            throws OAuthException, IOException, URISyntaxException {
         URL serviceURL = (new URL((URL) accessor.consumer
                 .getProperty("serviceProvider.baseURL"),
                 "services/rest/?method=anymeta.test.echo"));
