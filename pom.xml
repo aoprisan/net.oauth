@@ -19,7 +19,6 @@
 
   <build>
     <defaultGoal>package</defaultGoal>
-    <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -51,7 +50,6 @@
           </executions>
         </plugin>
       </plugins>
-    </pluginManagement>
   </build>
   <scm>
     <connection>scm:svn:http://oauth.googlecode.com/svn/code/java/</connection>
