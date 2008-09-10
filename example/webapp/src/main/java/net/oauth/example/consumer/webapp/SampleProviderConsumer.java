@@ -22,17 +22,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
+import net.oauth.client.OAuthClient;
 import net.oauth.server.OAuthServlet;
 
 /**
@@ -77,7 +76,8 @@ public class SampleProviderConsumer extends HttpServlet {
         }
         OAuthMessage request = accessor.newRequestMessage("POST", (new URL(
                 baseURL, "echo")).toExternalForm(), parameters);
-        OAuthMessage response = CookieConsumer.CLIENT.invoke(request);
+        OAuthMessage response = CookieConsumer.CLIENT.invoke(request,
+                OAuthClient.ParameterStyle.AUTHORIZATION_HEADER);
         String responseBody = response.getBodyAsString();
         return responseBody;
     }
