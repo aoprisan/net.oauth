@@ -39,6 +39,10 @@
         <servlet-name>SampleProviderConsumer</servlet-name>
         <servlet-class>net.oauth.example.consumer.webapp.SampleProviderConsumer</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>YahooConsumer</servlet-name>
+        <servlet-class>net.oauth.example.consumer.webapp.YahooConsumer</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>MagnoliaConsumer</servlet-name>
         <url-pattern>/Magnolia</url-pattern>
@@ -70,5 +74,9 @@
     <servlet-mapping>
         <servlet-name>SampleProviderConsumer</servlet-name>
         <url-pattern>/SampleProvider</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>YahooConsumer</servlet-name>
+        <url-pattern>/Yahoo</url-pattern>
     </servlet-mapping>
 </web-app>
