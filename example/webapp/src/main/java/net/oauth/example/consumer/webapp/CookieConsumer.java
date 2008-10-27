@@ -27,23 +27,20 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.ConsumerProperties;
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthProblemException;
-import net.oauth.client.HttpClientPool;
 import net.oauth.client.OAuthClient;
-import net.oauth.client.OAuthHttpClient;
+import net.oauth.client.httpclient3.HttpClientPool;
+import net.oauth.client.httpclient3.OAuthHttpClient;
 import net.oauth.server.OAuthServlet;
-
 import org.apache.commons.httpclient.HttpClient;
 
 /**
