@@ -10,7 +10,6 @@
   <artifactId>consumer</artifactId>
   <packaging>war</packaging>
   <name>OAuth::Examples::Consumer webapp</name>
-
   <dependencies>
     <dependency>
       <groupId>commons-httpclient</groupId>

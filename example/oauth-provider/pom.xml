@@ -10,7 +10,6 @@
   <artifactId>provider</artifactId>
   <packaging>war</packaging>
   <name>OAuth::Examples::Provider webapp</name>
-
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -24,7 +23,6 @@
       <version>20081027</version>
     </dependency>
   </dependencies>
-
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>

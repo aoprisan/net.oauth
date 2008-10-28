@@ -10,7 +10,6 @@
   <artifactId>oauth-examples-parent</artifactId>
   <packaging>pom</packaging>
   <name>OAuth::Examples::Parent POM</name>
-
   <modules>
     <module>oauth-provider</module>
     <module>webapp</module>
