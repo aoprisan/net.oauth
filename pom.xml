@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <packaging>pom</packaging>
   <url>http://oauth.net/code/</url>
 
   <!-- override these ones -->
-  <version>20081027</version>
   <groupId>net.oauth</groupId>
   <artifactId>oauth-parent</artifactId>
+  <version>20081103</version>
+  <packaging>pom</packaging>
   <name>OAuth::Parent POM</name>
 
   <modules>
