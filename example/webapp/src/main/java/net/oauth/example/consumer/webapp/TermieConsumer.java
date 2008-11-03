@@ -20,18 +20,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
-import net.oauth.server.OAuthServlet;
+import net.oauth.server.HttpRequestMessage;
 
 /**
  * A trivial consumer of the 'echo' service at term.ie.
@@ -50,7 +48,7 @@ public class TermieConsumer extends HttpServlet {
             consumer = CookieConsumer.getConsumer(NAME, getServletContext());
             OAuthAccessor accessor = CookieConsumer.getAccessor(request,
                     response, consumer);
-            List<OAuth.Parameter> parameters = OAuthServlet.getParameters(request);
+            List<OAuth.Parameter> parameters = HttpRequestMessage.getParameters(request);
             response.setContentType("text/plain");
             PrintWriter out = response.getWriter();
             out.println(NAME + " said:");

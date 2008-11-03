@@ -32,7 +32,7 @@ import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.client.OAuthClient;
-import net.oauth.server.OAuthServlet;
+import net.oauth.server.HttpRequestMessage;
 
 /**
  * Consumer for Sample OAuth Provider
@@ -50,8 +50,7 @@ public class SampleProviderConsumer extends HttpServlet {
             consumer = CookieConsumer.getConsumer(NAME, getServletContext());
             OAuthAccessor accessor = CookieConsumer.getAccessor(request,
                     response, consumer);
-            Collection<OAuth.Parameter> parameters = OAuthServlet
-                    .getParameters(request);
+            Collection<OAuth.Parameter> parameters = HttpRequestMessage.getParameters(request);
             if (!OAuth.newMap(parameters).containsKey("echo")) {
                 parameters.add(new OAuth.Parameter("echo", "Hello."));
             }

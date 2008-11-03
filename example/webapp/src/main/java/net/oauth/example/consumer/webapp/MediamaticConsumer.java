@@ -22,19 +22,17 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
-import net.oauth.server.OAuthServlet;
+import net.oauth.server.HttpRequestMessage;
 
 /**
  * A trivial consumer of the 'echo' service at Mediamatic.
@@ -53,8 +51,7 @@ public class MediamaticConsumer extends HttpServlet {
             consumer = CookieConsumer.getConsumer(NAME, getServletContext());
             OAuthAccessor accessor = CookieConsumer.getAccessor(request,
                     response, consumer);
-            List<OAuth.Parameter> parameters = OAuthServlet
-                    .getParameters(request);
+            List<OAuth.Parameter> parameters = HttpRequestMessage.getParameters(request);
             response.setContentType("text/plain");
             // Try it twice:
             echo(accessor, parameters, response);
