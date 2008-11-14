@@ -1,3 +1,4 @@
+<%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
 <%@page import="net.oauth.OAuthProblemException"%>
 <%@page import="net.oauth.server.OAuthServlet"%>
@@ -9,13 +10,14 @@ OAuthProblemException:<br/>
 <table>
 <%
     OAuthProblemException p = (OAuthProblemException) request.getAttribute("OAuthProblemException");
-    for (Map.Entry<String, Object> parameter : p.getParameters().entrySet()) {
+    for (Iterator i = p.getParameters().entrySet().iterator(); i.hasNext(); ) {
+        Map.Entry parameter = (Map.Entry) i.next();
         Object v = parameter.getValue();
         if (v != null) {
             String value = v.toString();
             %>
     <tr valign="top">
-        <td align="right"><%=OAuthServlet.htmlEncode(parameter.getKey())%>:&nbsp;</td>
+        <td align="right"><%=OAuthServlet.htmlEncode((String) parameter.getKey())%>:&nbsp;</td>
         <td><%
             if (value == null) {
                 %>&nbsp;<%
