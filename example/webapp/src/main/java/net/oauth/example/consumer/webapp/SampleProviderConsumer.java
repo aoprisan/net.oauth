@@ -77,7 +77,7 @@ public class SampleProviderConsumer extends HttpServlet {
                 baseURL, "echo")).toExternalForm(), parameters);
         OAuthMessage response = CookieConsumer.CLIENT.invoke(request,
                 OAuthClient.ParameterStyle.AUTHORIZATION_HEADER);
-        String responseBody = response.getBodyAsString();
+        String responseBody = response.readBodyAsString();
         return responseBody;
     }
 

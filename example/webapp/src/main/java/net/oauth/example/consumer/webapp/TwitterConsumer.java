@@ -18,12 +18,10 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
@@ -49,7 +47,7 @@ public class TwitterConsumer extends HttpServlet {
                             accessor,
                             "http://twitter.com/statuses/friends_timeline/jmkristian.xml",
                             null);
-            String responseBody = result.getBodyAsString();
+            String responseBody = result.readBodyAsString();
             response.setContentType("text/plain");
             PrintWriter out = response.getWriter();
             out.println("twitter said:");

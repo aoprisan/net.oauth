@@ -20,12 +20,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
@@ -58,7 +56,7 @@ public class YahooConsumer extends HttpServlet {
 					response, consumer);
 			OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
 					TEST_URL, OAuth.newList());
-			String responseBody = result.getBodyAsString();
+			String responseBody = result.readBodyAsString();
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
 			out.println(CONSUMER_NAME + " said:");

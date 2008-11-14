@@ -64,7 +64,7 @@ public class TermieConsumer extends HttpServlet {
             throws OAuthException, IOException, URISyntaxException {
         OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
                 "http://term.ie/oauth/example/echo_api.php", parameters);
-        String responseBody = result.getBodyAsString();
+        String responseBody = result.readBodyAsString();
         return responseBody;
     }
 

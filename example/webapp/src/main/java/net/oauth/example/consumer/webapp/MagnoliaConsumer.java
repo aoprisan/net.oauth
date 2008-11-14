@@ -18,12 +18,10 @@ package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
@@ -50,7 +48,7 @@ public class MagnoliaConsumer extends HttpServlet {
             OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
                     "http://ma.gnolia.com/api/rest/2/tags_find", OAuth.newList(
                             "person", System.getProperty("user.name")));
-            String responseBody = result.getBodyAsString();
+            String responseBody = result.readBodyAsString();
             response.setContentType("text/plain");
             PrintWriter out = response.getWriter();
             out.println(CONSUMER_NAME + " said:");
