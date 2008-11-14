@@ -4,10 +4,10 @@
   <parent>
     <groupId>net.oauth</groupId>
     <artifactId>oauth-parent</artifactId>
-    <version>20081103</version>
+    <version>20081113</version>
   </parent>
   <groupId>net.oauth.example</groupId>
-  <artifactId>consumer</artifactId>
+  <artifactId>oauth-consumer</artifactId>
   <packaging>war</packaging>
   <name>OAuth::Examples::Consumer webapp</name>
   <dependencies>
@@ -24,8 +24,8 @@
     </dependency>
     <dependency>
       <groupId>net.oauth</groupId>
-      <artifactId>core</artifactId>
-      <version>20081103</version>
+      <artifactId>oauth-core</artifactId>
+      <version>20081113</version>
     </dependency>
   </dependencies>
   <build>
