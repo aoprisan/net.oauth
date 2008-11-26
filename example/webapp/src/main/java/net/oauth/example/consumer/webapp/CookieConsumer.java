@@ -38,10 +38,8 @@ import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthProblemException;
 import net.oauth.client.OAuthClient;
-import net.oauth.client.httpclient3.HttpClientPool;
-import net.oauth.client.httpclient3.OAuthHttpClient;
+import net.oauth.client.httpclient3.HttpClient3;
 import net.oauth.server.OAuthServlet;
-import org.apache.commons.httpclient.HttpClient;
 
 /**
  * Utility methods for consumers that store tokens and secrets in cookies. Each
@@ -52,14 +50,7 @@ import org.apache.commons.httpclient.HttpClient;
  */
 public class CookieConsumer {
 
-    public static final OAuthClient CLIENT = new OAuthHttpClient(
-            new HttpClientPool() {
-                // This trivial 'pool' simply allocates a new client every time.
-                // More efficient implementations are possible.
-                public HttpClient getHttpClient(URL server) {
-                    return new HttpClient();
-                }
-            });
+    public static final OAuthClient CLIENT = new OAuthClient(new HttpClient3());
 
     private static Properties consumerProperties = null;
 
