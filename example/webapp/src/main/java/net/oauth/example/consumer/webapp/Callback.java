@@ -17,14 +17,11 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
