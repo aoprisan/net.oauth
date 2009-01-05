@@ -8,9 +8,11 @@
   </parent>
   <groupId>net.oauth.example</groupId>
   <artifactId>oauth-examples-parent</artifactId>
+  <version>20090105</version>
   <packaging>pom</packaging>
   <name>OAuth::Examples::Parent POM</name>
   <modules>
+    <module>desktop</module>
     <module>oauth-provider</module>
     <module>webapp</module>
   </modules>
