@@ -61,32 +61,23 @@ public class Callback extends HttpServlet {
             final OAuthAccessor accessor = CookieConsumer.newAccessor(consumer,
                     cookies);
             final String expectedToken = accessor.requestToken;
-            String requestToken = requestMessage.getParameter("oauth_token");
+            String requestToken = requestMessage.getParameter(OAuth.OAUTH_TOKEN);
             if (requestToken == null || requestToken.length() <= 0) {
                 log.warning(request.getMethod() + " "
                         + OAuthServlet.getRequestURL(request));
                 requestToken = expectedToken;
                 if (requestToken == null) {
-                    OAuthProblemException problem = new OAuthProblemException(
-                            "parameter_absent");
-                    problem.setParameter("oauth_parameters_absent",
-                            "oauth_token");
+                    OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.PARAMETER_ABSENT);
+                    problem.setParameter(OAuth.Problems.OAUTH_PARAMETERS_ABSENT, OAuth.OAUTH_TOKEN);
                     throw problem;
                 }
             } else if (!requestToken.equals(expectedToken)) {
-                OAuthProblemException problem = new OAuthProblemException(
-                        "token_rejected");
+                OAuthProblemException problem = new OAuthProblemException("token_rejected");
                 problem.setParameter("oauth_rejected_token", requestToken);
                 problem.setParameter("oauth_expected_token", expectedToken);
                 throw problem;
             }
-            OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor,
-                    consumer.serviceProvider.accessTokenURL, OAuth.newList(
-                            "oauth_token", requestToken));
-            Map<String, String> responseParameters = OAuth.newMap(result
-                    .getParameters());
-            accessor.accessToken = responseParameters.get("oauth_token");
-            accessor.tokenSecret = responseParameters.get("oauth_token_secret");
+            OAuthMessage result = CookieConsumer.CLIENT.getAccessToken(accessor, null, null);
             if (accessor.accessToken != null) {
                 String returnTo = requestMessage.getParameter("returnTo");
                 if (returnTo == null) {
@@ -101,9 +92,8 @@ public class Callback extends HttpServlet {
                                 accessor.tokenSecret);
                 throw new RedirectException(returnTo);
             }
-            OAuthProblemException problem = new OAuthProblemException(
-                    "parameter_absent");
-            problem.setParameter("oauth_parameters_absent", "oauth_token");
+            OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.PARAMETER_ABSENT);
+            problem.setParameter(OAuth.Problems.OAUTH_PARAMETERS_ABSENT, OAuth.OAUTH_TOKEN);
             problem.getParameters().putAll(result.getDump());
             throw problem;
         } catch (Exception e) {

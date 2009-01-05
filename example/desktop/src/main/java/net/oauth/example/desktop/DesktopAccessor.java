@@ -114,11 +114,7 @@ public class DesktopAccessor {
                         BareBonesBrowserLaunch.browse(authorizationURL);
                         oauth.wait();
                         if (oauth.accessToken == null) {
-                            OAuthMessage response = getClient().invoke(oauth,
-                                    oauth.consumer.serviceProvider.accessTokenURL,
-                                    OAuth.newList("oauth_token", oauth.requestToken));
-                            oauth.accessToken = response.getParameter("oauth_token");
-                            oauth.tokenSecret = response.getParameter("oauth_token_secret");
+                            getClient().getAccessToken(oauth, null, null);
                         }
                     }
                 }
