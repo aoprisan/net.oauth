@@ -8,7 +8,7 @@
   <!-- override these ones -->
   <groupId>net.oauth</groupId>
   <artifactId>oauth-parent</artifactId>
-  <version>20081218</version>
+  <version>20090105</version>
   <packaging>pom</packaging>
   <name>OAuth::Parent POM</name>
 

@@ -4,11 +4,10 @@
   <parent>
     <groupId>net.oauth</groupId>
     <artifactId>oauth-parent</artifactId>
-    <version>20081218</version>
+    <version>20090105</version>
   </parent>
   <groupId>net.oauth.example</groupId>
   <artifactId>oauth-examples-parent</artifactId>
-  <version>20090105</version>
   <packaging>pom</packaging>
   <name>OAuth::Examples::Parent POM</name>
   <modules>

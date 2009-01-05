@@ -70,7 +70,7 @@
     <dependency>
       <groupId>net.oauth</groupId>
       <artifactId>oauth-core</artifactId>
-      <version>20081218</version>
+      <version>20090105</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
