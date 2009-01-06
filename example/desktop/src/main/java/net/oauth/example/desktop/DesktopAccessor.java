@@ -36,6 +36,7 @@ import net.oauth.OAuthProblemException;
 import net.oauth.client.OAuthClient;
 import net.oauth.client.httpclient3.HttpClient3;
 import net.oauth.http.HttpMessage;
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
@@ -108,6 +109,9 @@ public class DesktopAccessor {
                                     , "oauth_callback", callbackURL //
                                     );
                             server = new Server(callbackPort);
+                            for (Connector c : server.getConnectors()) {
+                                c.setHost("localhost"); // local clients only
+                            }
                             server.setHandler(newCallback());
                             server.start();
                         }
