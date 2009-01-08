@@ -21,6 +21,8 @@ import net.oauth.OAuth;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthServiceProvider;
+import net.oauth.client.OAuthClient;
+import net.oauth.client.httpclient4.HttpClient4;
 
 /**
  * An OAuth application that edits a <a
@@ -54,6 +56,7 @@ public class Mediamatic {
         final String serviceURL = "http://oauth-sandbox.mediamatic.nl/services/rest/";
         final String objectId = "117";
         final DesktopAccessor accessor = new DesktopAccessor(consumer);
+        accessor.setClient(new OAuthClient(new HttpClient4()));
         OAuthMessage result = accessor.access(OAuthMessage.GET, serviceURL //
                 , OAuth.newList("method", "anymeta.predicates.get" //
                         // or anymeta.test.echo

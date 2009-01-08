@@ -34,7 +34,7 @@ import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.client.OAuthClient;
-import net.oauth.client.httpclient3.HttpClient3;
+import net.oauth.client.URLConnectionClient;
 import net.oauth.http.HttpMessage;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -206,7 +206,7 @@ public class DesktopAccessor {
 
     }
 
-    private static final OAuthClient DEFAULT_CLIENT = new OAuthClient(new HttpClient3());
+    private static final OAuthClient DEFAULT_CLIENT = new OAuthClient(new URLConnectionClient());
     private static final String CALLBACK_PATH = "/oauth/callback";
 
     static { // suppress log output from Jetty
