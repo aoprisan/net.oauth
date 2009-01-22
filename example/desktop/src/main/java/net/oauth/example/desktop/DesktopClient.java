@@ -43,7 +43,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
 /**
- * An OAuth accessor that obtains authorization by launching a browser, via
+ * An OAuth client that obtains authorization by launching a browser, via
  * which the user can authenticate to the service provider. This is annoying,
  * because it leaves a browser window open on the user's desktop. Microsoft
  * Internet Explorer will ask "Do you want to close this window?" But it doesn't
@@ -62,10 +62,10 @@ import org.mortbay.jetty.handler.AbstractHandler;
  * 
  * @author John Kristian
  */
-public class DesktopAccessor {
+public class DesktopClient {
 
-    public DesktopAccessor(OAuthConsumer consumer) {
-        oauth = new OAuthAccessor(consumer);
+    public DesktopClient(OAuthConsumer consumer) {
+        accessor = new OAuthAccessor(consumer);
     }
 
     /**
@@ -73,16 +73,16 @@ public class DesktopAccessor {
      * coordinate the threads executing access and the threads in the embedded
      * web server.
      */
-    private final OAuthAccessor oauth;
+    private final OAuthAccessor accessor;
 
-    private OAuthClient client = DEFAULT_CLIENT;
+    private OAuthClient oauthClient = DEFAULT_CLIENT;
 
-    public OAuthClient getClient() {
-        return client;
+    public OAuthClient getOAuthClient() {
+        return oauthClient;
     }
 
-    public void setClient(OAuthClient client) {
-        this.client = client;
+    public void setOAuthClient(OAuthClient client) {
+        this.oauthClient = client;
     }
 
     /**
@@ -97,15 +97,15 @@ public class DesktopAccessor {
         try {
             Server server = null;
             try {
-                synchronized (oauth) {
+                synchronized (accessor) {
                     String authorizationURL = null;
-                    while (oauth.accessToken == null) {
-                        getClient().getRequestToken(oauth);
+                    while (accessor.accessToken == null) {
+                        getOAuthClient().getRequestToken(accessor);
                         if (authorizationURL == null) {
                             final int callbackPort = getEphemeralPort();
                             final String callbackURL = "http://localhost:" + callbackPort + CALLBACK_PATH;
-                            authorizationURL = OAuth.addParameters(oauth.consumer.serviceProvider.userAuthorizationURL //
-                                    , "oauth_token", oauth.requestToken //
+                            authorizationURL = OAuth.addParameters(accessor.consumer.serviceProvider.userAuthorizationURL //
+                                    , "oauth_token", accessor.requestToken //
                                     , "oauth_callback", callbackURL //
                                     );
                             server = new Server(callbackPort);
@@ -116,9 +116,9 @@ public class DesktopAccessor {
                             server.start();
                         }
                         BareBonesBrowserLaunch.browse(authorizationURL);
-                        oauth.wait();
-                        if (oauth.accessToken == null) {
-                            getClient().getAccessToken(oauth, null, null);
+                        accessor.wait();
+                        if (accessor.accessToken == null) {
+                            getOAuthClient().getAccessToken(accessor, null, null);
                         }
                     }
                 }
@@ -131,7 +131,7 @@ public class DesktopAccessor {
                     }
                 }
             }
-            return getClient().invoke(oauth, httpMethod, resourceURL, parameters);
+            return getOAuthClient().invoke(accessor, httpMethod, resourceURL, parameters);
         } catch (OAuthProblemException p) {
             StringBuilder msg = new StringBuilder();
             String problem = p.getProblem();
@@ -161,9 +161,9 @@ public class DesktopAccessor {
     }
 
     protected void proceed(String requestToken) {
-        synchronized (oauth) {
-            if (requestToken == null || requestToken.equals(oauth.requestToken)) {
-                oauth.notifyAll();
+        synchronized (accessor) {
+            if (requestToken == null || requestToken.equals(accessor.requestToken)) {
+                accessor.notifyAll();
                 return;
             }
         }
@@ -176,11 +176,11 @@ public class DesktopAccessor {
 
     protected static class Callback extends AbstractHandler {
 
-        protected Callback(DesktopAccessor accessor) {
-            this.accessor = accessor;
+        protected Callback(DesktopClient client) {
+            this.client = client;
         }
 
-        protected final DesktopAccessor accessor;
+        protected final DesktopClient client;
 
         public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
                 throws IOException, ServletException {
@@ -188,7 +188,7 @@ public class DesktopAccessor {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } else {
                 conclude(response);
-                accessor.proceed(request.getParameter("oauth_token"));
+                client.proceed(request.getParameter("oauth_token"));
                 ((Request) request).setHandled(true);
             }
         }

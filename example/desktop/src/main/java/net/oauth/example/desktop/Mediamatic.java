@@ -55,22 +55,22 @@ public class Mediamatic {
                 , provider);
         final String serviceURL = "http://oauth-sandbox.mediamatic.nl/services/rest/";
         final String objectId = "117";
-        final DesktopAccessor accessor = new DesktopAccessor(consumer);
-        accessor.setClient(new OAuthClient(new HttpClient4()));
-        OAuthMessage result = accessor.access(OAuthMessage.GET, serviceURL //
+        final DesktopClient client = new DesktopClient(consumer);
+        client.setOAuthClient(new OAuthClient(new HttpClient4()));
+        OAuthMessage result = client.access(OAuthMessage.GET, serviceURL //
                 , OAuth.newList("method", "anymeta.predicates.get" //
                         // or anymeta.test.echo
                         , "id", objectId //
                         , "field", "text.title" //
                 ));
         System.out.println(result.readBodyAsString());
-        accessor.access(OAuthMessage.POST, serviceURL //
+        client.access(OAuthMessage.POST, serviceURL //
                 , OAuth.newList("method", "anymeta.predicates.set" //
                         , "id", objectId //
                         , "field", "text.body" //
                         , "value", "edited " + new Date() + " via Java Sample" //
                 ));
-        result = accessor.access(OAuthMessage.GET, serviceURL //
+        result = client.access(OAuthMessage.GET, serviceURL //
                 , OAuth.newList("method", "anymeta.predicates.get" //
                         , "id", objectId //
                         , "field", "text.body" //
