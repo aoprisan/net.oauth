@@ -17,7 +17,10 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
+import net.oauth.OAuthProblemException;
+import net.oauth.client.OAuthResponseMessage;
+import net.oauth.client.OAuthClient.ParameterStyle;
+import net.oauth.http.HttpMessage;
+import net.oauth.http.HttpResponseMessage;
 
 /**
  * A trivial consumer of the 'friends_timeline' service at Twitter.
@@ -34,24 +42,39 @@ import net.oauth.OAuthMessage;
 public class TwitterConsumer extends HttpServlet {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         OAuthConsumer consumer = null;
         try {
-            consumer = CookieConsumer.getConsumer("twitter",
-                    getServletContext());
-            OAuthAccessor accessor = CookieConsumer.getAccessor(request,
-                    response, consumer);
-            OAuthMessage result = CookieConsumer.CLIENT
-                    .invoke(
-                            accessor,
-                            "http://twitter.com/statuses/friends_timeline/jmkristian.xml",
-                            null);
-            String responseBody = result.readBodyAsString();
-            response.setContentType("text/plain");
-            PrintWriter out = response.getWriter();
-            out.println("twitter said:");
-            out.print(responseBody);
+            consumer = CookieConsumer.getConsumer("twitter", getServletContext());
+            OAuthAccessor accessor = CookieConsumer.getAccessor(request, response, consumer);
+            OAuthResponseMessage result = CookieConsumer.CLIENT.access(accessor.newRequestMessage(OAuthMessage.GET,
+                    "http://twitter.com/statuses/friends_timeline.atom", null), ParameterStyle.AUTHORIZATION_HEADER);
+            int status = result.getHttpResponse().getStatusCode();
+            if (status != HttpResponseMessage.STATUS_OK) {
+                OAuthProblemException problem = result.toOAuthProblemException();
+                if (problem.getProblem() != null) {
+                    throw problem;
+                }
+                Map<String, Object> dump = problem.getParameters();
+                response.setContentType("text/plain");
+                PrintWriter out = response.getWriter();
+                out.println(dump.get(HttpMessage.REQUEST));
+                out.println("----------------------");
+                out.println(dump.get(HttpMessage.RESPONSE));
+            } else {
+                // Simply pass the data through to the browser:
+                InputStream in = result.getBodyAsStream();
+                try {
+                    response.setContentType(result.getHeader("Content-Type"));
+                    OutputStream out = response.getOutputStream();
+                    byte[] buffer = new byte[1024];
+                    for (int len; 0 < (len = in.read(buffer, 0, buffer.length));) {
+                        out.write(buffer, 0, len);
+                    }
+                } finally {
+                    in.close();
+                }
+            }
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
         }
