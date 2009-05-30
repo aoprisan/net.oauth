@@ -5,7 +5,7 @@
     <artifactId>oauth-examples-parent</artifactId>
     <version>20090105</version>
   </parent>
-  <artifactId>oauth-desktop</artifactId>
+  <artifactId>oauth-example-desktop</artifactId>
   <packaging>jar</packaging>
   <name>OAuth::Examples::Desktop Consumer</name>
   <build>

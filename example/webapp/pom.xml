@@ -6,7 +6,7 @@
     <artifactId>oauth-examples-parent</artifactId>
     <version>20090105</version>
   </parent>
-  <artifactId>oauth-consumer</artifactId>
+  <artifactId>oauth-example-consumer</artifactId>
   <packaging>war</packaging>
   <name>OAuth::Examples::Consumer webapp</name>
   <dependencies>

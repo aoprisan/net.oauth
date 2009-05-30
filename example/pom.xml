@@ -17,9 +17,9 @@
   </modules>
   <repositories>
     <repository>
-      <id>oauth-local</id>
-      <name>Local OAuth Repository</name>
-      <url>file:../../../maven</url>
+      <id>oauth</id>
+      <name>OAuth Repository</name>
+      <url>http://oauth.googlecode.com/svn/code/maven</url>
     </repository>
   </repositories>
 </project>
