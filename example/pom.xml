@@ -15,4 +15,11 @@
     <module>oauth-provider</module>
     <module>webapp</module>
   </modules>
+  <repositories>
+    <repository>
+      <id>oauth-local</id>
+      <name>Local OAuth Repository</name>
+      <url>file:../../../maven</url>
+    </repository>
+  </repositories>
 </project>

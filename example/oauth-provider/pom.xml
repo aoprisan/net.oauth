@@ -19,7 +19,7 @@
     <dependency>
       <groupId>net.oauth</groupId>
       <artifactId>oauth-core</artifactId>
-      <version>20090105</version>
+      <version>20090525</version>
     </dependency>
   </dependencies>
   <build>
