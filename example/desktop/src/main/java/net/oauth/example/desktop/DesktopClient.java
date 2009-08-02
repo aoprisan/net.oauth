@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,11 +44,11 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
 /**
- * An OAuth client that obtains authorization by launching a browser, via
- * which the user can authenticate to the service provider. This is annoying,
- * because it leaves a browser window open on the user's desktop. Microsoft
- * Internet Explorer will ask "Do you want to close this window?" But it doesn't
- * close the window automatically.
+ * An OAuth client that obtains authorization by launching a browser, via which
+ * the user can authenticate to the service provider. This is annoying, because
+ * it leaves a browser window open on the user's desktop. Microsoft Internet
+ * Explorer will ask "Do you want to close this window?" But it doesn't close
+ * the window automatically.
  * <p>
  * The implementation involves an embedded web server (Jetty). To obtain
  * authorization, {@link access} launches a browser and directs it to the
@@ -74,7 +75,7 @@ public class DesktopClient {
      * web server.
      */
     private final OAuthAccessor accessor;
-
+    private String verifier = null;
     private OAuthClient oauthClient = DEFAULT_CLIENT;
 
     public OAuthClient getOAuthClient() {
@@ -98,28 +99,38 @@ public class DesktopClient {
             Server server = null;
             try {
                 synchronized (accessor) {
-                    String authorizationURL = null;
+                    List<OAuth.Parameter> callback = null;
                     while (accessor.accessToken == null) {
-                        getOAuthClient().getRequestToken(accessor);
-                        if (authorizationURL == null) {
+                        if (server == null) {
+                            // Start an HTTP server:
                             final int callbackPort = getEphemeralPort();
-                            final String callbackURL = "http://localhost:" + callbackPort + CALLBACK_PATH;
-                            authorizationURL = OAuth.addParameters(accessor.consumer.serviceProvider.userAuthorizationURL //
-                                    , "oauth_token", accessor.requestToken //
-                                    , "oauth_callback", callbackURL //
-                                    );
                             server = new Server(callbackPort);
                             for (Connector c : server.getConnectors()) {
                                 c.setHost("localhost"); // local clients only
                             }
                             server.setHandler(newCallback());
                             server.start();
+                            // Callbacks will be directed to this server:
+                            callback = OAuth.newList(OAuth.OAUTH_CALLBACK, //
+                                    "http://localhost:" + callbackPort + CALLBACK_PATH);
+                        }
+                        OAuthMessage response = getOAuthClient().getRequestTokenResponse(accessor, null, callback);
+                        String authorizationURL = OAuth.addParameters(
+                                accessor.consumer.serviceProvider.userAuthorizationURL //
+                                , OAuth.OAUTH_TOKEN, accessor.requestToken //
+                                );
+                        if (response.getParameter(OAuth.OAUTH_CALLBACK_CONFIRMED) == null) {
+                            // It appears the service provider implements OAuth 1.0, not 1.0a.
+                            authorizationURL = OAuth.addParameters(authorizationURL, callback);
                         }
                         BareBonesBrowserLaunch.browse(authorizationURL);
                         accessor.wait();
                         if (accessor.accessToken == null) {
-                            getOAuthClient().getAccessToken(accessor, null, null);
+                            oauthClient.getAccessToken(accessor, null, //
+                                    (verifier == null) ? null : //
+                                            OAuth.newList(OAuth.OAUTH_VERIFIER, verifier.toString()));
                         }
+                        accessor.notifyAll();
                     }
                 }
             } finally {
@@ -160,9 +171,10 @@ public class DesktopClient {
         }
     }
 
-    protected void proceed(String requestToken) {
+    protected void proceed(String requestToken, String verifier) {
         synchronized (accessor) {
             if (requestToken == null || requestToken.equals(accessor.requestToken)) {
+                this.verifier = verifier;
                 accessor.notifyAll();
                 return;
             }
@@ -188,7 +200,8 @@ public class DesktopClient {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } else {
                 conclude(response);
-                client.proceed(request.getParameter("oauth_token"));
+                client.proceed(request.getParameter(OAuth.OAUTH_TOKEN),
+                               request.getParameter(OAuth.OAUTH_VERIFIER));
                 ((Request) request).setHandled(true);
             }
         }
