@@ -17,26 +17,23 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
-import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
-import net.oauth.ParameterStyle;
 import net.oauth.server.HttpRequestMessage;
 
 /**
- * A trivial consumer of the 'echo' service at Mediamatic.
+ * A trivial client of the <a
+ * href="http://oauth-sandbox.mediamatic.nl/services/rest/#anymeta.predicates.get"
+ * >predicates service</a> at <a
+ * href="http://oauth-sandbox.mediamatic.nl/">Mediamatic</a>. This isn't very
+ * useful; it merely illustrates how to user OAuth to access Mediamatic's API.
  * 
  * @author John Kristian
  */
@@ -46,41 +43,34 @@ public class MediamaticConsumer extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+        throws IOException, ServletException
+    {
         OAuthConsumer consumer = null;
         try {
             consumer = CookieConsumer.getConsumer(NAME, getServletContext());
-            OAuthAccessor accessor = CookieConsumer.getAccessor(request,
-                    response, consumer);
+            OAuthAccessor accessor = CookieConsumer.getAccessor(request, response, consumer);
             List<OAuth.Parameter> parameters = HttpRequestMessage.getParameters(request);
             response.setContentType("text/plain");
-            // Try it twice:
-            echo(accessor, parameters, response);
-            echo(accessor, parameters, response);
+            final String serviceURL = "http://oauth-sandbox.mediamatic.nl/services/rest/";
+            final String objectId = "117";
+            // Store some data into the object:
+            CookieConsumer.CLIENT.invoke(accessor //
+                    , OAuthMessage.POST, serviceURL //
+                    , OAuth.newList("method", "anymeta.predicates.set" //
+                            , "id", objectId //
+                            , "field", "text.body" //
+                            , "value", OAuth.formEncode(parameters) //
+                    ));
+            // Read the data out again:
+            OAuthMessage result = CookieConsumer.CLIENT.invoke(accessor //
+                    , OAuthMessage.GET, serviceURL //
+                    , OAuth.newList("method", "anymeta.predicates.get" //
+                            , "id", objectId //
+                            , "field", "text.body" //
+                    ));
+            response.getWriter().println(result.readBodyAsString());
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
-        }
-    }
-
-    private static void echo(OAuthAccessor accessor,
-            List<OAuth.Parameter> parameters, ServletResponse result)
-            throws OAuthException, IOException, URISyntaxException {
-        String serviceURL = (new URL((URL) accessor.consumer
-                .getProperty("serviceProvider.baseURL"),
-                "services/rest/?method=anymeta.test.echo")).toExternalForm();
-        OAuthMessage request = accessor.newRequestMessage(OAuthMessage.GET, serviceURL, parameters);
-        OAuthMessage response = CookieConsumer.CLIENT.invoke(request, ParameterStyle.QUERY_STRING);
-        OutputStream out = result.getOutputStream();
-        InputStream in = response.getBodyAsStream();
-        try {
-            byte[] buffer = new byte[32];
-            int len = 0;
-            while (0 < (len = in.read(buffer, 0, buffer.length))) {
-                out.write(buffer, 0, len);
-            }
-            out.write('\n');
-        } finally {
-            in.close();
         }
     }
 
