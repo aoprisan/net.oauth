@@ -68,7 +68,7 @@ public class Mediamatic {
                 , OAuth.newList("method", "anymeta.predicates.set" //
                         , "id", objectId //
                         , "field", "text.body" //
-                        , "value", "edited " + new Date() + " via Java Sample" //
+                        , "value", "edited " + new Date() + " via Java desktop application" //
                 ));
         result = client.access(OAuthMessage.GET, serviceURL //
                 , OAuth.newList("method", "anymeta.predicates.get" //
