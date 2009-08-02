@@ -36,6 +36,7 @@ import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
+import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.client.OAuthClient;
 import net.oauth.client.httpclient3.HttpClient3;
@@ -143,9 +144,12 @@ public class CookieConsumer {
      */
     private static void getAccessToken(HttpServletRequest request,
             CookieMap cookies, OAuthAccessor accessor)
-    throws OAuthException, IOException, URISyntaxException {
-        CLIENT.getRequestToken(accessor);
-        String consumerName = (String) accessor.consumer.getProperty("name");
+        throws OAuthException, IOException, URISyntaxException
+    {
+        final String consumerName = (String) accessor.consumer.getProperty("name");
+        final String callbackURL = getCallbackURL(request, consumerName);
+        OAuthMessage response = CLIENT.getRequestTokenResponse(accessor, null, //
+                OAuth.newList(OAuth.OAUTH_CALLBACK, callbackURL));
         cookies.put(consumerName + ".requestToken", accessor.requestToken);
         cookies.put(consumerName + ".tokenSecret", accessor.tokenSecret);
         String authorizationURL = accessor.consumer.serviceProvider.userAuthorizationURL;
@@ -154,14 +158,24 @@ public class CookieConsumer {
                     .toString()), request.getContextPath() + authorizationURL))
                     .toString();
         }
-        URL callbackURL = new URL(new URL(request.getRequestURL().toString()),
+        authorizationURL = OAuth.addParameters(authorizationURL //
+                , OAuth.OAUTH_TOKEN, accessor.requestToken);
+        if (response.getParameter(OAuth.OAUTH_CALLBACK_CONFIRMED) == null) {
+            authorizationURL = OAuth.addParameters(authorizationURL //
+                    , OAuth.OAUTH_CALLBACK, callbackURL);
+        }
+        throw new RedirectException(authorizationURL);
+    }
+
+    private static String getCallbackURL(HttpServletRequest request, String consumerName)
+        throws IOException
+    {
+        URL base = new URL(new URL(request.getRequestURL().toString()), //
                 request.getContextPath() + Callback.PATH);
-        throw new RedirectException(OAuth.addParameters(authorizationURL //
-                , "oauth_token", accessor.requestToken //
-                , "oauth_callback", OAuth.addParameters(callbackURL.toString() //
-                        , "consumer", consumerName //
-                        , "returnTo", getRequestPath(request) //
-                        )));
+        return OAuth.addParameters(base.toExternalForm() //
+                , "consumer", consumerName //
+                , "returnTo", getRequestPath(request) //
+                );
     }
 
     /** Reconstruct the requested URL path, complete with query string (if any). */

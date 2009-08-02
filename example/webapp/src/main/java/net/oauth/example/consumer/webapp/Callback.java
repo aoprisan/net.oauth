@@ -17,6 +17,7 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -74,7 +75,12 @@ public class Callback extends HttpServlet {
                 problem.setParameter("oauth_expected_token", expectedToken);
                 throw problem;
             }
-            OAuthMessage result = CookieConsumer.CLIENT.getAccessToken(accessor, null, null);
+            List<OAuth.Parameter> parameters = null;
+            String verifier = requestMessage.getParameter(OAuth.OAUTH_VERIFIER);
+            if (verifier != null) {
+                parameters = OAuth.newList(OAuth.OAUTH_VERIFIER, verifier);
+            }
+            OAuthMessage result = CookieConsumer.CLIENT.getAccessToken(accessor, null, parameters);
             if (accessor.accessToken != null) {
                 String returnTo = requestMessage.getParameter("returnTo");
                 if (returnTo == null) {
