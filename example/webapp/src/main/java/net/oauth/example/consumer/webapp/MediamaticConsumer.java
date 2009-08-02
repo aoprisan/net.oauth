@@ -32,6 +32,7 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
+import net.oauth.ParameterStyle;
 import net.oauth.server.HttpRequestMessage;
 
 /**
@@ -64,11 +65,11 @@ public class MediamaticConsumer extends HttpServlet {
     private static void echo(OAuthAccessor accessor,
             List<OAuth.Parameter> parameters, ServletResponse result)
             throws OAuthException, IOException, URISyntaxException {
-        URL serviceURL = (new URL((URL) accessor.consumer
+        String serviceURL = (new URL((URL) accessor.consumer
                 .getProperty("serviceProvider.baseURL"),
-                "services/rest/?method=anymeta.test.echo"));
-        OAuthMessage response = CookieConsumer.CLIENT.invoke(accessor,
-                serviceURL.toExternalForm(), parameters);
+                "services/rest/?method=anymeta.test.echo")).toExternalForm();
+        OAuthMessage request = accessor.newRequestMessage(OAuthMessage.GET, serviceURL, parameters);
+        OAuthMessage response = CookieConsumer.CLIENT.access(request, ParameterStyle.QUERY_STRING);
         OutputStream out = result.getOutputStream();
         InputStream in = response.getBodyAsStream();
         try {
