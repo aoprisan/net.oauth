@@ -29,8 +29,8 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.ParameterStyle;
 import net.oauth.client.OAuthResponseMessage;
-import net.oauth.client.OAuthClient.ParameterStyle;
 import net.oauth.http.HttpMessage;
 import net.oauth.http.HttpResponseMessage;
 

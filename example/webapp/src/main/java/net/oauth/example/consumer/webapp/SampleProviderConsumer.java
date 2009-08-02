@@ -31,7 +31,7 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
-import net.oauth.client.OAuthClient;
+import net.oauth.ParameterStyle;
 import net.oauth.server.HttpRequestMessage;
 
 /**
@@ -76,7 +76,7 @@ public class SampleProviderConsumer extends HttpServlet {
         OAuthMessage request = accessor.newRequestMessage("POST", (new URL(
                 baseURL, "echo")).toExternalForm(), parameters);
         OAuthMessage response = CookieConsumer.CLIENT.invoke(request,
-                OAuthClient.ParameterStyle.AUTHORIZATION_HEADER);
+                ParameterStyle.AUTHORIZATION_HEADER);
         String responseBody = response.readBodyAsString();
         return responseBody;
     }
