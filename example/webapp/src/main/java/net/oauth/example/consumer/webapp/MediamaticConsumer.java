@@ -69,7 +69,7 @@ public class MediamaticConsumer extends HttpServlet {
                 .getProperty("serviceProvider.baseURL"),
                 "services/rest/?method=anymeta.test.echo")).toExternalForm();
         OAuthMessage request = accessor.newRequestMessage(OAuthMessage.GET, serviceURL, parameters);
-        OAuthMessage response = CookieConsumer.CLIENT.access(request, ParameterStyle.QUERY_STRING);
+        OAuthMessage response = CookieConsumer.CLIENT.invoke(request, ParameterStyle.QUERY_STRING);
         OutputStream out = result.getOutputStream();
         InputStream in = response.getBodyAsStream();
         try {
