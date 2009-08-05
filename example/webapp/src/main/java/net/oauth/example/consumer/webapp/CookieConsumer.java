@@ -16,6 +16,10 @@
 
 package net.oauth.example.consumer.webapp;
 
+import java.io.OutputStream;
+
+import java.io.InputStream;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -49,7 +53,7 @@ import net.oauth.server.OAuthServlet;
  * 
  * @author John Kristian
  */
-public class CookieConsumer {
+public abstract class CookieConsumer {
 
     public static final OAuthClient CLIENT = new OAuthClient(new HttpClient3());
 
@@ -148,8 +152,13 @@ public class CookieConsumer {
     {
         final String consumerName = (String) accessor.consumer.getProperty("name");
         final String callbackURL = getCallbackURL(request, consumerName);
-        OAuthMessage response = CLIENT.getRequestTokenResponse(accessor, null, //
-                OAuth.newList(OAuth.OAUTH_CALLBACK, callbackURL));
+        List<OAuth.Parameter> parameters = OAuth.newList(OAuth.OAUTH_CALLBACK, callbackURL);
+        // Google needs to know what you intend to do with the access token:
+        Object scope = accessor.consumer.getProperty("request.scope");
+        if (scope != null) {
+            parameters.add(new OAuth.Parameter("scope", scope.toString()));
+        }
+        OAuthMessage response = CLIENT.getRequestTokenResponse(accessor, null, parameters);
         cookies.put(consumerName + ".requestToken", accessor.requestToken);
         cookies.put(consumerName + ".tokenSecret", accessor.tokenSecret);
         String authorizationURL = accessor.consumer.serviceProvider.userAuthorizationURL;
@@ -189,6 +198,17 @@ public class CookieConsumer {
             path.append("?").append(queryString);
         }
         return path.toString();
+    }
+
+    public static void copyAll(InputStream from, OutputStream into) throws IOException {
+        try {
+            byte[] buffer = new byte[1024];
+            for (int len; 0 < (len = from.read(buffer, 0, buffer.length));) {
+                into.write(buffer, 0, len);
+            }
+        } finally {
+            from.close();
+        }
     }
 
     /**

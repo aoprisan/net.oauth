@@ -12,6 +12,10 @@
         <servlet-class>net.oauth.example.consumer.webapp.Callback</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>GoogleContactsConsumer</servlet-name>
+        <servlet-class>net.oauth.example.consumer.webapp.GoogleContactsConsumer</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>MagnoliaConsumer</servlet-name>
         <servlet-class>net.oauth.example.consumer.webapp.MagnoliaConsumer</servlet-class>
     </servlet>
@@ -43,6 +47,10 @@
         <servlet-name>YahooConsumer</servlet-name>
         <servlet-class>net.oauth.example.consumer.webapp.YahooConsumer</servlet-class>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>GoogleContactsConsumer</servlet-name>
+        <url-pattern>/Google</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MagnoliaConsumer</servlet-name>
         <url-pattern>/Magnolia</url-pattern>

@@ -17,8 +17,6 @@
 package net.oauth.example.consumer.webapp;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -63,17 +61,8 @@ public class TwitterConsumer extends HttpServlet {
                 out.println(dump.get(HttpMessage.RESPONSE));
             } else {
                 // Simply pass the data through to the browser:
-                InputStream in = result.getBodyAsStream();
-                try {
-                    response.setContentType(result.getHeader("Content-Type"));
-                    OutputStream out = response.getOutputStream();
-                    byte[] buffer = new byte[1024];
-                    for (int len; 0 < (len = in.read(buffer, 0, buffer.length));) {
-                        out.write(buffer, 0, len);
-                    }
-                } finally {
-                    in.close();
-                }
+                response.setContentType(result.getHeader("Content-Type"));
+                CookieConsumer.copyAll(result.getBodyAsStream(), response.getOutputStream());
             }
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
