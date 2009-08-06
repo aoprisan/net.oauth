@@ -61,8 +61,7 @@ public class TwitterConsumer extends HttpServlet {
                 out.println(dump.get(HttpMessage.RESPONSE));
             } else {
                 // Simply pass the data through to the browser:
-                response.setContentType(result.getHeader("Content-Type"));
-                CookieConsumer.copyAll(result.getBodyAsStream(), response.getOutputStream());
+                CookieConsumer.copyResponse(result, response);
             }
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);

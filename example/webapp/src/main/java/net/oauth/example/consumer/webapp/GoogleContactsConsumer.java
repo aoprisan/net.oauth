@@ -16,6 +16,9 @@
 
 package net.oauth.example.consumer.webapp;
 
+import static net.oauth.OAuth.HMAC_SHA1;
+import static net.oauth.OAuth.OAUTH_SIGNATURE_METHOD;
+
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -46,12 +49,15 @@ public class GoogleContactsConsumer extends HttpServlet {
         try {
             consumer = CookieConsumer.getConsumer("googleContacts", getServletContext());
             OAuthAccessor accessor = CookieConsumer.getAccessor(request, response, consumer);
+            // You can switch to a different signature method:
+            accessor.consumer.setProperty(OAUTH_SIGNATURE_METHOD, HMAC_SHA1);
+            // HMAC uses the access token secret as a factor,
+            // and it's a little less compute-intensive than RSA.
             OAuthMessage message = accessor.newRequestMessage(OAuthMessage.GET,
                     "http://www.google.com/m8/feeds/contacts/default/full", null);
             OAuthMessage result = CookieConsumer.CLIENT.invoke(message, ParameterStyle.AUTHORIZATION_HEADER);
             // Simply pass the data through to the browser:
-            response.setContentType(result.getHeader("Content-Type"));
-            CookieConsumer.copyAll(result.getBodyAsStream(), response.getOutputStream());
+            CookieConsumer.copyResponse(result, response);
         } catch (Exception e) {
             CookieConsumer.handleException(e, request, response, consumer);
         }

@@ -200,14 +200,21 @@ public abstract class CookieConsumer {
         return path.toString();
     }
 
-    public static void copyAll(InputStream from, OutputStream into) throws IOException {
+    public static void copyResponse(OAuthMessage from, HttpServletResponse into) throws IOException {
+        InputStream in = from.getBodyAsStream();
+        OutputStream out = into.getOutputStream();
+        into.setContentType(from.getHeader("Content-Type"));
         try {
-            byte[] buffer = new byte[1024];
-            for (int len; 0 < (len = from.read(buffer, 0, buffer.length));) {
-                into.write(buffer, 0, len);
-            }
+            CookieConsumer.copyAll(in, out);
         } finally {
-            from.close();
+            in.close();
+        }
+    }
+
+    private static void copyAll(InputStream from, OutputStream into) throws IOException {
+        byte[] buffer = new byte[1024];
+        for (int len; 0 < (len = from.read(buffer, 0, buffer.length));) {
+            into.write(buffer, 0, len);
         }
     }
 
