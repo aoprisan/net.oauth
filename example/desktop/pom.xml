@@ -68,9 +68,14 @@
       <version>6.1.11</version>
     </dependency>
     <dependency>
-      <groupId>net.oauth</groupId>
-      <artifactId>oauth-core</artifactId>
-      <version>20090530</version>
+      <groupId>net.oauth.core</groupId>
+      <artifactId>oauth</artifactId>
+      <version>20090617</version>
+    </dependency>
+    <dependency>
+      <groupId>net.oauth.core</groupId>
+      <artifactId>oauth-consumer</artifactId>
+      <version>20090617</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
